@@ -1,14 +1,41 @@
 "use strict";
+const databaseName = 'regridfs'
 
-const fuse = require('fusejs').fuse;
-const ExampleFS = require('./regridfs').ExampleFS;
-const exec = require('child_process').exec;
-const os = require('os');
+let initDb = async function () {
+  var dbs = await r.dbList().run()
+  if (!dbs.includes(databaseName)) {
+    console.log('creating db')
+    r.dbCreate(databaseName).run()
+  }
+
+}
+
+let start = async function () {
+  await initDb()
+  const ReGrid = require('rethinkdb-regrid');
+  var bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
+  bucket.initBucket()
+
+  let fileBuffer = fs.readFileSync('C:\\temp\\51gKtH9dzOL.jpg')
+  
+  let newFile = await bucket.writeFile({filename: '/temp/image.jpg', buffer: fileBuffer})
+  console.log(newFile)
+}
+
+
+// const fuse = require('fusejs').fuse;
+// const ExampleFS = require('./regridfs').ExampleFS;
+
+var r = require('rethinkdbdash')()
+// const exec = require('child_process').exec;
+// const os = require('os');
 const fs = require('fs');
 
-console.log(process.argv.slice(2, process.argv.length));
+start()
 
-const m = fuse.mount({
-  filesystem: ExampleFS,
-  options: ["ExampleFS"].concat(process.argv.slice(2, process.argv.length))
-});
+// console.log(process.argv.slice(2, process.argv.length));
+
+// fuse.mount({
+//   filesystem: ExampleFS,
+//   options: ["ExampleFS"].concat(process.argv.slice(2, process.argv.length))
+// });

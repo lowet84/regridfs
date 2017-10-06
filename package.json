@@ -4,7 +4,7 @@
   "description": "Fuse mount for ReGrid",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js"
   },
   "repository": {
     "type": "git",
@@ -13,8 +13,6 @@
   "author": "Fredrik Löwenhamn (fredrik.lowenhmn@gmail.com)",
   "license": "ISC",
   "dependencies": {
-    "fusejs": "^1.4.3",
-    "nan": "^2.7.0",
     "rethinkdb-regrid": "^0.8.1"
   }
 }

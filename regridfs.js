@@ -40,7 +40,7 @@ const file = {
 }
 
 const fusejs = require('fusejs'); //require('fusejs');
-const FileSystem = fusejs.FileSystem;
+// const FileSystem = fusejs.FileSystem;
 const PosixError = fusejs.PosixError;
 
 
