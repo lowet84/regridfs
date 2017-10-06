@@ -13,7 +13,8 @@
   "author": "Fredrik Löwenhamn (fredrik.lowenhmn@gmail.com)",
   "license": "ISC",
   "dependencies": {
-    "rethinkdb-regrid": "^0.8.1",
-    "fusejs": "^1.4.3"
+    "fusejs": "^1.4.3",
+    "nan": "^2.7.0",
+    "rethinkdb-regrid": "^0.8.1"
   }
 }
