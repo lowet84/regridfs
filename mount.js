@@ -11,7 +11,7 @@ async function start () {
   await regridfs.setHost(host)
   fuse.mount({
     filesystem: RegridFS,
-    options: ["RegridFS"].concat(process.argv.slice(2, process.argv.length))
+    options: ["RegridFS"].concat(process.argv.slice(3, process.argv.length))
   });
 }
 
