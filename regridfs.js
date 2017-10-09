@@ -56,7 +56,10 @@ class RegridFS extends fusejs.FileSystem {
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   lookup (context, parentInode, name, reply) {
-
+    console.log(`context: ${JSON.stringify(context)}`)
+    console.log(`parentInode: ${JSON.stringify(parentInode)}`)
+    console.log(`name: ${JSON.stringify(name)}`)
+    console.log(`reply: ${JSON.stringify(reply)}`)
     if (parentInode == 1 && name === "hello") {
       const entry = {
         inode: 2, //inode of the child, in this case the folder hello

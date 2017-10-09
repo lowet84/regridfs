@@ -16,34 +16,15 @@ let start = async function () {
   var bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
   bucket.initBucket()
 
-  // let fileBuffer = fs.readFileSync('C:\\temp\\51gKtH9dzOL.jpg')
-
-  // let newFile = await bucket.writeFile({filename: '/temp/image.jpg', buffer: fileBuffer})
-  // console.log(newFile)
+  var exists = await bucket.listFilename('/temp/test.txt').toArray()
+  if (exists.length === 0) {
+    var fileBuffer = Buffer.from("TEST!!!", 'utf8');
+    console.log(fileBuffer)
+    let newFile = await bucket.writeFile({ filename: '/temp/test.txt', buffer: fileBuffer })
+    console.log(newFile)
+  }
 }
 
-
-// const fuse = require('fusejs').fuse;
-// const ExampleFS = require('./regridfs').ExampleFS;
-
-let args = process.argv.slice(2, process.argv.length)
-let host = args[0]
-console.log(host)
-var r = require('rethinkdbdash')({
-  // servers: [
-  //   { host: host }
-  // ]
-})
-
-// const exec = require('child_process').exec;
-// const os = require('os');
-// const fs = require('fs');
+var r = require('rethinkdbdash')()
 
 start()
-
-// console.log(process.argv.slice(2, process.argv.length));
-
-// fuse.mount({
-//   filesystem: ExampleFS,
-//   options: ["ExampleFS"].concat(process.argv.slice(2, process.argv.length))
-// });
