@@ -184,7 +184,7 @@ let initDb = async function () {
   var dbs = await r.dbList().run()
   if (!dbs.includes(databaseName)) {
     console.log('creating db')
-    r.dbCreate(databaseName).run()
+    await r.dbCreate(databaseName).run()
   }
 }
 
