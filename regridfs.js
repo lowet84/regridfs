@@ -176,4 +176,29 @@ class RegridFS extends fusejs.FileSystem {
 
 }
 
-module.exports.RegridFS = RegridFS;
+const databaseName = 'regridfs'
+
+var r = null
+
+let initDb = async function () {
+  var dbs = await r.dbList().run()
+  if (!dbs.includes(databaseName)) {
+    console.log('creating db')
+    r.dbCreate(databaseName).run()
+  }
+}
+
+async function setHost (host) {
+  r = require('rethinkdbdash')({
+    servers: [
+      { host: host }
+    ]
+  })
+
+  await initDb()
+  const ReGrid = require('rethinkdb-regrid');
+  var bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
+  bucket.initBucket()
+}
+
+module.exports = { RegridFS, setHost }

@@ -1,21 +1,14 @@
 "use strict";
+const fuse = require('fusejs').fuse;
+const regridfs = require('./regridfs');
+const RegridFS = regridfs.RegridFS
 
-const databaseName = 'regridfs'
+let args = process.argv.slice(2, process.argv.length)
+let host = args[0]
+console.log(host)
 
-let initDb = async function () {
-  var dbs = await r.dbList().run()
-  if (!dbs.includes(databaseName)) {
-    console.log('creating db')
-    r.dbCreate(databaseName).run()
-  }
-}
-
-let start = async function () {
-  await initDb()
-  const ReGrid = require('rethinkdb-regrid');
-  var bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
-  bucket.initBucket()
-
+async function start () {
+  await regridfs.setHost(host)
   fuse.mount({
     filesystem: RegridFS,
     options: ["RegridFS"].concat(process.argv.slice(2, process.argv.length))
@@ -23,20 +16,7 @@ let start = async function () {
 }
 
 
-const fuse = require('fusejs').fuse;
-const RegridFS = require('./regridfs').RegridFS;
-
-let args = process.argv.slice(2, process.argv.length)
-let host = args[0]
-console.log(host)
-var r = require('rethinkdbdash')({
-  servers: [
-    { host: host }
-  ]
-})
-
+start()
 // const exec = require('child_process').exec;
 // const os = require('os');
 // const fs = require('fs');
-
-start()
