@@ -44,7 +44,7 @@ const fusejs = require('fusejs'); //require('fusejs');
 const PosixError = fusejs.PosixError;
 
 
-class ExampleFS extends fusejs.FileSystem {
+class RegridFS extends fusejs.FileSystem {
 
 	/* 
 	the context object contains 4 fields:
@@ -99,8 +99,8 @@ class ExampleFS extends fusejs.FileSystem {
     return;
   }
   releasedir (context, inode, fileInfo, reply) {
-    // console.log('Releasedir was called!');
-    // console.log(fileInfo);
+    console.log('Releasedir was called!');
+    console.log(fileInfo);
     reply.err(0);
   }
 
@@ -176,4 +176,4 @@ class ExampleFS extends fusejs.FileSystem {
 
 }
 
-module.exports.ExampleFS = ExampleFS;
+module.exports.RegridFS = RegridFS;

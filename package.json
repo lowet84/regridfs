@@ -4,7 +4,8 @@
   "description": "Fuse mount for ReGrid",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "node ./mount.js localhost",
+    "test": "node ./test.js"
   },
   "repository": {
     "type": "git",
