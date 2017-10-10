@@ -29,7 +29,7 @@ const now = Date.now();
 //   nlink: 2 //itself counts as one and the file 
 // }
 
-// var file_content = "hello world";
+var file_content = "hello world";
 // const file = {
 //   inode: 3,
 //   ctime: now,
@@ -55,19 +55,21 @@ class RegridFS extends fusejs.FileSystem {
 	*/
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
-  async lookup (context, inode, name, reply) {
+  async lookup (context, parentInode, name, reply) {
     console.log('==================== lookup ====================')
-    console.log(`inode: ${inode}`)
+    console.log(`parentInode: ${parentInode}`)
     console.log(`name: ${name}`)
-    let inodeItem = await common.getNode(inode)
-    if (inodeItem === null) {
+    let parentItem = await common.getFolder(parentInode)
+    if (parentItem === null) {
       reply.err(PosixError.ENOTENT);
       return
     }
+    var item = await parentItem.nodes.find(d=>d.name===name)
+    let inodeItem = await common.getNode(item.id)
     let attr = await common.getNodeAttr(inodeItem)
-    console.log(`attr: ${attr}`)
+    console.log(`attr: ${JSON.stringify(attr)}`)
     const entry = {
-      inode: inode,
+      inode: item.id,
       attr: attr,
       generation: 1
     }
@@ -118,14 +120,18 @@ class RegridFS extends fusejs.FileSystem {
 
     // const size = Math.max( requestedSize , children.length * 256);
     const size = Math.max(requestedSize, 256);
-    let inodeItem = await common.getNode(inode)
+    let inodeItem = await common.getFolder(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
       return
     }
 
-    let attr = await common.getNodeAttr(inodeItem)
-    reply.addDirEntry(inodeItem.name, size, attr, offset);
+    for (var index = 0; index < inodeItem.nodes.length; index++) {
+      var child = inodeItem.nodes[index];
+      let attr = await common.getNodeAttr(child)
+      return reply.addDirEntry(child.name, size, attr, offset)
+    }
+    
     reply.buffer(new Buffer(0), requestedSize);
   }
 
