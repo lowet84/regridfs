@@ -204,15 +204,13 @@ let getINode = async function () {
 
 let initDb = async function () {
   var dbs = await r.dbList().run()
-  if (dbs.includes(databaseName)) {
-    console.log('dropping db')
-    await r.dbDrop(databaseName).run()
+  if (!dbs.includes(databaseName)) {
+    console.log('creating db')
+    await r.dbCreate(databaseName).run()
+    await r.db(databaseName).tableCreate(nodeTable).run()
+    await r.db(databaseName).tableCreate(miscTable).run()
+    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
   }
-  console.log('creating db')
-  await r.dbCreate(databaseName).run()
-  await r.db(databaseName).tableCreate(nodeTable).run()
-  await r.db(databaseName).tableCreate(miscTable).run()
-  await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
 }
 
 async function setHost (host) {
