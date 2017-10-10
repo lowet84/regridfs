@@ -8,7 +8,7 @@ let host = args[0]
 console.log(host)
 
 async function start () {
-  await regridfs.setHost(host)
+  await regridfs.init(host)
   fuse.mount({
     filesystem: RegridFS,
     options: ["RegridFS"].concat(process.argv.slice(3, process.argv.length))
@@ -17,6 +17,3 @@ async function start () {
 
 
 start()
-// const exec = require('child_process').exec;
-// const os = require('os');
-// const fs = require('fs');
