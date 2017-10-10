@@ -130,19 +130,19 @@ class RegridFS extends fusejs.FileSystem {
     reply.buffer(new Buffer(0), requestedSize);
   }
 
-  open (context, inode, fileInfo, reply) {
+  async open (context, inode, fileInfo, reply) {
     console.log('==================== open ====================')
-    if (inode == 3) {
-      reply.open(fileInfo);
-      return;
+    let inodeItem = await common.getNode(inode)
+    if (inodeItem === null) {
+      reply.err(PosixError.ENOTENT);
+      return
     }
-    if (inode < 3) {
+    if (inodeItem.fileId === undefined) {
       reply.err(PosixError.EISDIR);
       return;
     }
-
-    reply.err(PosixError.ENOENT);
-
+    reply.open(fileInfo);
+    return;
   }
 
   read (context, inode, len, offset, fileInfo, reply) {
