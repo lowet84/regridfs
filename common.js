@@ -60,6 +60,10 @@ let addRootIfNeeded = async function () {
   }
 }
 
+let readFile = async function (fileId) {
+  return await bucket.readFile({ id: fileId })
+}
+
 let addDir = async function (inode, name) {
   let parent = await r.db(databaseName).table(nodeTable).get(inode).run()
   let newDir = {
@@ -144,4 +148,13 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
-module.exports = { init, bucket, addDir, addFile, getNode, getNodeAttr, getFolder }
+module.exports = {
+  init,
+  bucket,
+  addDir,
+  addFile,
+  getNode,
+  getNodeAttr,
+  getFolder,
+  readFile
+}

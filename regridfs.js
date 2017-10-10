@@ -113,7 +113,7 @@ class RegridFS extends fusejs.FileSystem {
 		*/
 
     // const size = Math.max( requestedSize , children.length * 256);
-    
+
     let inodeItem = await common.getFolder(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
@@ -131,7 +131,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async open (context, inode, fileInfo, reply) {
-    console.log('==================== open ====================')
+    console.log('==================== (open) ====================')
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
@@ -145,16 +145,18 @@ class RegridFS extends fusejs.FileSystem {
     return;
   }
 
-  read (context, inode, len, offset, fileInfo, reply) {
+  async read (context, inode, len, offset, fileInfo, reply) {
     console.log('==================== read ====================')
-    if (inode == 3) {
-      const length = file_content.length
-      const content = file_content.substr(offset, Math.min(length, offset + len));
-      reply.buffer(new Buffer(content), content.length);
-      return;
+    let inodeItem = await common.getNode(inode)
+    if (inodeItem === null) {
+      reply.err(PosixError.ENOTENT);
+      return
     }
 
-    reply.err(PosixError.ENOENT);
+
+    const length = inodeItem.size
+    const content = file_content.substr(offset, Math.min(length, offset + len));
+    reply.buffer(new Buffer(content), content.length);
     return;
   }
 
