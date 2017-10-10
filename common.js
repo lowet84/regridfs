@@ -31,7 +31,7 @@ let initDb = async function (reset) {
     await r.dbCreate(databaseName).run()
     await r.db(databaseName).tableCreate(nodeTable).run()
     await r.db(databaseName).tableCreate(miscTable).run()
-    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
+    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 1 })
   }
 }
 
