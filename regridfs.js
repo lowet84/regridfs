@@ -80,10 +80,13 @@ class RegridFS extends fusejs.FileSystem {
 
   }
 
-  getattr (context, inode, reply) {
+  async getattr (context, inode, reply) {
     console.log('==================== getattr ====================')
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
+
+    let inodeItem = await r.db(databaseName).table(nodeTable).get(inode).run()
+    console.log(inodeItem)
     switch (inode) {
       case 1:
         reply.attr(root, 3600); //3600, a timeout value, in seconds, for the validity of this inode. so one hour
@@ -99,6 +102,7 @@ class RegridFS extends fusejs.FileSystem {
     }
     return;
   }
+
   releasedir (context, inode, fileInfo, reply) {
     // console.log('==================== releasedir ====================')
     reply.err(0);
@@ -182,8 +186,21 @@ class RegridFS extends fusejs.FileSystem {
 }
 
 const databaseName = 'regridfs'
+const nodeTable = 'inodes'
+const miscTable = 'misc'
 
 var r = null
+
+let getINode = async function () {
+  let inode = await r.db(databaseName).table(miscTable).get('nextInode').run()
+  let value = inode.value
+  await r.db(databaseName)
+    .table(miscTable)
+    .get('nextInode')
+    .update({ value: value + 1 })
+    .run()
+  return value
+}
 
 let initDb = async function () {
   var dbs = await r.dbList().run()

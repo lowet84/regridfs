@@ -1,7 +1,7 @@
 "use strict";
 
 const databaseName = 'regridfs'
-const dirTable = 'directories'
+const nodeTable = 'inodes'
 const miscTable = 'misc'
 var bucket = null
 
@@ -23,7 +23,7 @@ let initDb = async function () {
   }
   console.log('creating db')
   await r.dbCreate(databaseName).run()
-  await r.db(databaseName).tableCreate(dirTable).run()
+  await r.db(databaseName).tableCreate(nodeTable).run()
   await r.db(databaseName).tableCreate(miscTable).run()
   await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
 }
@@ -35,7 +35,7 @@ let initBucket = async function () {
 }
 
 let addRoot = async function () {
-  await r.db(databaseName).table(dirTable).insert({
+  await r.db(databaseName).table(nodeTable).insert({
     files: [],
     subdirs: [],
     id: await getINode()
@@ -54,15 +54,16 @@ let getINode = async function () {
 }
 
 let addFile = async function (inode, file) {
-  let folder = await r.db(databaseName).table(dirTable).get(inode).run()
+  let folder = await r.db(databaseName).table(nodeTable).get(inode).run()
   let newFile = await bucket.writeFile(file)
   let fileInFolder = {
-    inode: await getINode(),
+    id: await getINode(),
     filename: file.filename,
     fileId: newFile.id
   }
   folder.files.push(fileInFolder)
-  await r.db(databaseName).table(dirTable).get(inode).update(folder).run()
+  await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
+  await r.db(databaseName).table(nodeTable).get(inode).update(folder).run()
   return newFile
 }
 
@@ -72,7 +73,7 @@ let getTestFile = async function () {
 }
 
 let addSomeDir = async function (inode, name) {
-  let parent = await r.db(databaseName).table(dirTable).get(inode).run()
+  let parent = await r.db(databaseName).table(nodeTable).get(inode).run()
   let newDir = {
     files: [],
     subdirs: [],
@@ -80,8 +81,8 @@ let addSomeDir = async function (inode, name) {
   }
   parent.subdirs.push({ id: newDir.id, name: name })
 
-  await r.db(databaseName).table(dirTable).insert(newDir).run()
-  await r.db(databaseName).table(dirTable).get(inode).update(parent).run()
+  await r.db(databaseName).table(nodeTable).insert(newDir).run()
+  await r.db(databaseName).table(nodeTable).get(inode).update(parent).run()
   return newDir.id
 }
 
