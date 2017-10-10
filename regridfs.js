@@ -85,31 +85,22 @@ class RegridFS extends fusejs.FileSystem {
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
 
-    let inodeItem = await r.db(databaseName).table(nodeTable).get(inode).run()
-    console.log(inodeItem)
-    switch (inode) {
-      case 1:
-        reply.attr(root, 3600); //3600, a timeout value, in seconds, for the validity of this inode. so one hour
-        break;
-      case 2:
-        reply.attr(folder, 3600); //3600, a timeout value, in seconds, for the validity of this inode. so one hour
-        break;
-      case 3:
-        reply.attr(file, 3600); //3600, a timeout value, in seconds, for the validity of this inode. so one hour
-        break;
-      default:
-        reply.err(PosixError.ENOTENT);
+    let inodeItem = await common.getNode(inode)
+    if(inodeItem===undefined){
+      reply.err(PosixError.ENOTENT);
+    }
+    else{
+      let attr = await getNodeAttr(inodeItem)
+      reply.attr(attr, 3600);
     }
     return;
   }
 
   releasedir (context, inode, fileInfo, reply) {
-    // console.log('==================== releasedir ====================')
     reply.err(0);
   }
 
   opendir (context, inode, fileInfo, reply) {
-    // console.log('==================== opendir ====================')
     reply.open(fileInfo);
   }
 
@@ -178,52 +169,39 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   release (context, inode, fileInfo, reply) {
-    // console.log('==================== release ====================')
     reply.err(0);
   }
-
-
 }
 
-const databaseName = 'regridfs'
-const nodeTable = 'inodes'
-const miscTable = 'misc'
+var common = require('./common')
 
-var r = null
-
-let getINode = async function () {
-  let inode = await r.db(databaseName).table(miscTable).get('nextInode').run()
-  let value = inode.value
-  await r.db(databaseName)
-    .table(miscTable)
-    .get('nextInode')
-    .update({ value: value + 1 })
-    .run()
-  return value
-}
-
-let initDb = async function () {
-  var dbs = await r.dbList().run()
-  if (!dbs.includes(databaseName)) {
-    console.log('creating db')
-    await r.dbCreate(databaseName).run()
-    await r.db(databaseName).tableCreate(nodeTable).run()
-    await r.db(databaseName).tableCreate(miscTable).run()
-    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
+let getNodeAttr = async function (item) {
+  let mode = null
+  let size = null
+  let nlink = null
+  if (item.filename !== undefined) {
+    mode = 33279
+    size = item.size
+    nlink = 1
   }
+  else{
+    mode = 16895
+    size = 4096
+    nlink = 1 + item.files.length + item.subdirs.length
+  }
+  let attr = {
+    inode: item.id,
+    ctime: item.created,
+    mtime: item.modified,
+    mode: mode,
+    size: size,
+    nlink: nlink
+  }
+  return attr
 }
 
-async function setHost (host) {
-  r = require('rethinkdbdash')({
-    servers: [
-      { host: host }
-    ]
-  })
-
-  await initDb()
-  const ReGrid = require('rethinkdb-regrid');
-  var bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
-  bucket.initBucket()
+async function init (host) {
+  await common.init(host)
 }
 
-module.exports = { RegridFS, setHost }
+module.exports = { RegridFS, init }
