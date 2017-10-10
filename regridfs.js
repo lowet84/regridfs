@@ -58,6 +58,7 @@ class RegridFS extends fusejs.FileSystem {
   async lookup (context, parentInode, name, reply) {
     console.log('==================== lookup ====================')
     console.log(`name: ${name}`)
+    console.log(`parentInode: ${parentInode}`)
     let parentItem = await common.getFolder(parentInode)
     console.log(`parentItem: ${JSON.stringify(parentItem)}`)
     let item = await parentItem.nodes.find(d=>d.name==name)
