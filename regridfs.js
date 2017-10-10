@@ -119,16 +119,17 @@ class RegridFS extends fusejs.FileSystem {
 		*/
 
     // const size = Math.max( requestedSize , children.length * 256);
-    const size = Math.max(requestedSize, 256);
+    
     let inodeItem = await common.getFolder(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
       return
     }
 
+    const size = Math.max(requestedSize, inodeItem.nodes.length * 256);
     for (var index = 0; index < inodeItem.nodes.length; index++) {
       var child = inodeItem.nodes[index]
-      console.log(`child: ${child}`)
+      console.log(`child: ${JSON.stringify(child)}`)
       let attr = await common.getNodeAttr(child)
       return reply.addDirEntry(child.name, size, attr, offset)
     }
