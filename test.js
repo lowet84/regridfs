@@ -7,6 +7,7 @@ let initDb = async function () {
   if (!dbs.includes(databaseName)) {
     console.log('creating db')
     r.dbCreate(databaseName).run()
+    r.tableCreate('inodes').run()
   }
 }
 
