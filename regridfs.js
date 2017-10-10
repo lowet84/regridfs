@@ -20,24 +20,24 @@ const now = Date.now();
 //   nlink: 2 //itself counts as one and the folder
 // }
 
-const folder = {
-  inode: 2,
-  ctime: now,
-  mtime: now,
-  mode: 16895,//0o40777
-  size: 4096, //standard size of a folder
-  nlink: 2 //itself counts as one and the file 
-}
+// const folder = {
+//   inode: 2,
+//   ctime: now,
+//   mtime: now,
+//   mode: 16895,//0o40777
+//   size: 4096, //standard size of a folder
+//   nlink: 2 //itself counts as one and the file 
+// }
 
-var file_content = "hello world";
-const file = {
-  inode: 3,
-  ctime: now,
-  mtime: now,
-  mode: 33279,//0o100777
-  size: file_content.length, //standard size of a folder
-  nlink: 1 //a file only has one link
-}
+// var file_content = "hello world";
+// const file = {
+//   inode: 3,
+//   ctime: now,
+//   mtime: now,
+//   mode: 33279,//0o100777
+//   size: file_content.length, //standard size of a folder
+//   nlink: 1 //a file only has one link
+// }
 
 const fusejs = require('fusejs'); //require('fusejs');
 // const FileSystem = fusejs.FileSystem;
@@ -57,6 +57,8 @@ class RegridFS extends fusejs.FileSystem {
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   async lookup (context, inode, name, reply) {
     console.log('==================== lookup ====================')
+    console.log(`inode: ${inode}`)
+    console.log(`name: ${name}`)
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
