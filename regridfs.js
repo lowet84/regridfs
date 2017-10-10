@@ -58,7 +58,7 @@ class RegridFS extends fusejs.FileSystem {
   async lookup (context, parentInode, name, reply) {
     console.log('==================== lookup ====================')
     let parentItem = await common.getFolder(parentInode)
-    let item = await parentItem.nodes.find(d=>d.name=='name')
+    let item = await parentItem.nodes.find(d=>d.name==name)
     if(item===null){
       reply.err(PosixError.ENOENT)
       return
