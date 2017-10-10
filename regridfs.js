@@ -11,14 +11,14 @@
 "use strict";
 const now = Date.now();
 
-const root = {
-  inode: 1,
-  ctime: now,
-  mtime: now,
-  mode: 16895,//0o40777
-  size: 4096, //standard size of a folder
-  nlink: 2 //itself counts as one and the folder
-}
+// const root = {
+//   inode: 1,
+//   ctime: now,
+//   mtime: now,
+//   mode: 16895,//0o40777
+//   size: 4096, //standard size of a folder
+//   nlink: 2 //itself counts as one and the folder
+// }
 
 const folder = {
   inode: 2,
@@ -81,18 +81,18 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async getattr (context, inode, reply) {
-    console.log('==================== getattr ====================')
+    console.log('==================== (getattr) ====================')
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
 
     let inodeItem = await common.getNode(inode)
-    if(inodeItem===undefined){
+    if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
+      return
     }
-    else{
-      let attr = await getNodeAttr(inodeItem)
-      reply.attr(attr, 3600);
-    }
+
+    let attr = await getNodeAttr(inodeItem)
+    reply.attr(attr, 3600);
     return;
   }
 
@@ -105,7 +105,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
 
-  readdir (context, inode, requestedSize, offset, fileInfo, reply) {
+  async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
     console.log('==================== readdir ====================')
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
@@ -124,20 +124,15 @@ class RegridFS extends fusejs.FileSystem {
 
     // const size = Math.max( requestedSize , children.length * 256);
     const size = Math.max(requestedSize, 256);
-
-
-    switch (inode) {
-      case 1:
-        reply.addDirEntry("hello", size, folder, offset);
-        reply.buffer(new Buffer(0), requestedSize)
-        break;
-      case 2:
-        reply.addDirEntry("world.txt", size, file, offset);
-        reply.buffer(new Buffer(0), requestedSize);
-        break;
-      default:
-        reply.err(PosixError.ENOENT)
+    let inodeItem = await common.getNode(inode)
+    if (inodeItem === null) {
+      reply.err(PosixError.ENOTENT);
+      return
     }
+
+    let attr = await getNodeAttr(inodeItem)
+    reply.addDirEntry(inodeItem.name, size, attr, offset);
+    reply.buffer(new Buffer(0), requestedSize);
   }
 
   open (context, inode, fileInfo, reply) {
@@ -179,12 +174,12 @@ let getNodeAttr = async function (item) {
   let mode = null
   let size = null
   let nlink = null
-  if (item.filename !== undefined) {
+  if (item.fileId !== undefined) {
     mode = 33279
     size = item.size
     nlink = 1
   }
-  else{
+  else {
     mode = 16895
     size = 4096
     nlink = 1 + item.files.length + item.subdirs.length

@@ -53,7 +53,10 @@ let addRootIfNeeded = async function () {
     await r.db(databaseName).table(nodeTable).insert({
       files: [],
       subdirs: [],
-      id: await getNextINode()
+      name: 'root',
+      id: await getNextINode(),
+      created: Date.now(),
+      modified: Date.now()
     })
   }
 }
@@ -63,6 +66,7 @@ let addDir = async function (inode, name) {
   let newDir = {
     files: [],
     subdirs: [],
+    name: name,
     id: await getNextINode(),
     created: Date.now(),
     modified: Date.now()
@@ -79,7 +83,7 @@ let addFile = async function (inode, file) {
   let newFile = await bucket.writeFile(file)
   let fileInFolder = {
     id: await getNextINode(),
-    filename: file.filename,
+    name: file.filename,
     fileId: newFile.id
   }
   folder.files.push(fileInFolder)
