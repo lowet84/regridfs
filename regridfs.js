@@ -55,24 +55,18 @@ class RegridFS extends fusejs.FileSystem {
 	*/
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
-  async lookup (context, parentInode, name, reply) {
+  async lookup (context, inode, name, reply) {
     console.log('==================== lookup ====================')
-    console.log(`name: ${name}`)
-    console.log(`parentInode: ${parentInode}`)
-    let parentItem = await common.getFolder(parentInode)
-    console.log(`parentItem: ${JSON.stringify(parentItem)}`)
-    let item = await parentItem.nodes.find(d=>d.name==name)
-    console.log(`item: ${JSON.stringify(item)}`)
-    if(item===null){
-      reply.err(PosixError.ENOENT)
+    let inodeItem = await common.getNode(inode)
+    if (inodeItem === null) {
+      reply.err(PosixError.ENOTENT);
       return
     }
-    let inodeItem = await common.getNode(item.id)
     let attr = await common.getNodeAttr(inodeItem)
     const entry = {
-      inode: item.id, //inode of the child, in this case the folder hello
+      inode: inode,
       attr: attr,
-      generation: 1 //some filesystems rely on this generation number, such as the  Network Filesystem
+      generation: 1
     }
     reply.entry(entry);
   }
