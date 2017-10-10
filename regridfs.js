@@ -59,9 +59,9 @@ class RegridFS extends fusejs.FileSystem {
     console.log('==================== lookup ====================')
     console.log(`name: ${name}`)
     let parentItem = await common.getFolder(parentInode)
-    console.log(`parentItem: ${parentItem}`)
+    console.log(`parentItem: ${JSON.stringify(parentItem)}`)
     let item = await parentItem.nodes.find(d=>d.name==name)
-    console.log(`item: ${item}`)
+    console.log(`item: ${JSON.stringify(item)}`)
     if(item===null){
       reply.err(PosixError.ENOENT)
       return
