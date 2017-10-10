@@ -135,6 +135,7 @@ class RegridFS extends fusejs.FileSystem {
       return reply.addDirEntry(child.name, size, attr, offset)
     }
 
+    console.log(`buffer`)
     reply.buffer(new Buffer(0), requestedSize);
   }
 
