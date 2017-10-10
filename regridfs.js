@@ -65,6 +65,7 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
     let attr = await common.getNodeAttr(inodeItem)
+    console.log(`attr: ${attr}`)
     const entry = {
       inode: inode,
       attr: attr,
