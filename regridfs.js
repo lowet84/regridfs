@@ -103,6 +103,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
     console.log('==================== (readdir) ====================')
+    console.log(`inode: ${JSON.stringify(inode)}`)
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
 		/*
