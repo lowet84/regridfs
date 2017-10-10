@@ -64,7 +64,7 @@ class RegridFS extends fusejs.FileSystem {
       reply.err(PosixError.ENOTENT);
       return
     }
-    var item = await parentItem.nodes.find(d=>d.name===name)
+    var item = await parentItem.nodes.find(d => d.name === name)
     let inodeItem = await common.getNode(item.id)
     let attr = await common.getNodeAttr(inodeItem)
     console.log(`attr: ${JSON.stringify(attr)}`)
@@ -127,11 +127,12 @@ class RegridFS extends fusejs.FileSystem {
     }
 
     for (var index = 0; index < inodeItem.nodes.length; index++) {
-      var child = inodeItem.nodes[index];
+      var child = inodeItem.nodes[index]
+      console.log(`child: ${child}`)
       let attr = await common.getNodeAttr(child)
       return reply.addDirEntry(child.name, size, attr, offset)
     }
-    
+
     reply.buffer(new Buffer(0), requestedSize);
   }
 
