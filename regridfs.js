@@ -100,12 +100,12 @@ class RegridFS extends fusejs.FileSystem {
     return;
   }
   releasedir (context, inode, fileInfo, reply) {
-    console.log('==================== releasedir ====================')
+    // console.log('==================== releasedir ====================')
     reply.err(0);
   }
 
   opendir (context, inode, fileInfo, reply) {
-    console.log('==================== opendir ====================')
+    // console.log('==================== opendir ====================')
     reply.open(fileInfo);
   }
 
@@ -174,7 +174,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   release (context, inode, fileInfo, reply) {
-    console.log('==================== release ====================')
+    // console.log('==================== release ====================')
     reply.err(0);
   }
 
