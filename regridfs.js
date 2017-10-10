@@ -56,10 +56,7 @@ class RegridFS extends fusejs.FileSystem {
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   lookup (context, parentInode, name, reply) {
-    // console.log(`context: ${JSON.stringify(context)}`)
-    // console.log(`parentInode: ${JSON.stringify(parentInode)}`)
-    // console.log(`name: ${JSON.stringify(name)}`)
-    // console.log(`reply: ${JSON.stringify(reply)}`)
+    console.log('==================== lookup ====================')
     if (parentInode == 1 && name === "hello") {
       const entry = {
         inode: 2, //inode of the child, in this case the folder hello
@@ -84,6 +81,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   getattr (context, inode, reply) {
+    console.log('==================== getattr ====================')
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
     switch (inode) {
@@ -102,17 +100,18 @@ class RegridFS extends fusejs.FileSystem {
     return;
   }
   releasedir (context, inode, fileInfo, reply) {
-    // console.log('Releasedir was called!');
-    // console.log(fileInfo);
+    console.log('==================== releasedir ====================')
     reply.err(0);
   }
 
   opendir (context, inode, fileInfo, reply) {
+    console.log('==================== opendir ====================')
     reply.open(fileInfo);
   }
 
 
   readdir (context, inode, requestedSize, offset, fileInfo, reply) {
+    console.log('==================== readdir ====================')
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
 		/*
@@ -147,6 +146,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   open (context, inode, fileInfo, reply) {
+    console.log('==================== open ====================')
     if (inode == 3) {
       reply.open(fileInfo);
       return;
@@ -161,6 +161,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   read (context, inode, len, offset, fileInfo, reply) {
+    console.log('==================== read ====================')
     if (inode == 3) {
       const length = file_content.length
       const content = file_content.substr(offset, Math.min(length, offset + len));
@@ -173,6 +174,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   release (context, inode, fileInfo, reply) {
+    console.log('==================== release ====================')
     reply.err(0);
   }
 
