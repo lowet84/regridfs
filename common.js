@@ -48,7 +48,7 @@ let getNextINode = async function () {
 
 let addRootIfNeeded = async function () {
   var exists = await r.db(databaseName).table(nodeTable).get(0).run()
-  if (exists.id === undefined) {
+  if (exists === undefined) {
     console.log('creating root folder')
     await r.db(databaseName).table(nodeTable).insert({
       files: [],
