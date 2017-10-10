@@ -55,29 +55,22 @@ class RegridFS extends fusejs.FileSystem {
 	*/
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
-  lookup (context, parentInode, name, reply) {
+  async lookup (context, parentInode, name, reply) {
     console.log('==================== lookup ====================')
-    if (parentInode == 1 && name === "hello") {
-      const entry = {
-        inode: 2, //inode of the child, in this case the folder hello
-        attr: folder,
-        generation: 1 //some filesystems rely on this generation number, such as the  Network Filesystem
-      }
-      reply.entry(entry);
-      return;
+    let parentItem = await common.getFolder(parentInode)
+    let item = await parentItem.nodes.find(d=>d.name=='name')
+    if(item===null){
+      reply.err(PosixError.ENOENT)
+      return
     }
-
-    if (parentInode == 2 && name === "world.txt") {
-      const entry = {
-        inode: 3, //inode of the child, in this case the file world.txt
-        attr: file,
-        generation: 1 //some filesystems rely on this generation number, such as the  Network Filesystem
-      }
-      reply.entry(entry);
-      return;
+    let inodeItem = await common.getNode(item.id)
+    let attr = await common.getNodeAttr(inodeItem)
+    const entry = {
+      inode: item.id, //inode of the child, in this case the folder hello
+      attr: attr,
+      generation: 1 //some filesystems rely on this generation number, such as the  Network Filesystem
     }
-    reply.err(PosixError.ENOENT);
-
+    reply.entry(entry);
   }
 
   async getattr (context, inode, reply) {
@@ -91,7 +84,7 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
 
-    let attr = await getNodeAttr(inodeItem)
+    let attr = await common.getNodeAttr(inodeItem)
     reply.attr(attr, 3600);
     return;
   }
@@ -106,7 +99,7 @@ class RegridFS extends fusejs.FileSystem {
 
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
-    console.log('==================== readdir ====================')
+    console.log('==================== (readdir) ====================')
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
 		/*
@@ -130,7 +123,7 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
 
-    let attr = await getNodeAttr(inodeItem)
+    let attr = await common.getNodeAttr(inodeItem)
     reply.addDirEntry(inodeItem.name, size, attr, offset);
     reply.buffer(new Buffer(0), requestedSize);
   }
@@ -169,31 +162,6 @@ class RegridFS extends fusejs.FileSystem {
 }
 
 var common = require('./common')
-
-let getNodeAttr = async function (item) {
-  let mode = null
-  let size = null
-  let nlink = null
-  if (item.fileId !== undefined) {
-    mode = 33279
-    size = item.size
-    nlink = 1
-  }
-  else {
-    mode = 16895
-    size = 4096
-    nlink = 1 + item.files.length + item.subdirs.length
-  }
-  let attr = {
-    inode: item.id,
-    ctime: item.created,
-    mtime: item.modified,
-    mode: mode,
-    size: size,
-    nlink: nlink
-  }
-  return attr
-}
 
 async function init (host) {
   await common.init(host)

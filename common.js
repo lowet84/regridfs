@@ -51,8 +51,7 @@ let addRootIfNeeded = async function () {
   if (exists === null) {
     console.log('creating root folder')
     await r.db(databaseName).table(nodeTable).insert({
-      files: [],
-      subdirs: [],
+      nodes: [],
       name: 'root',
       id: await getNextINode(),
       created: Date.now(),
@@ -64,14 +63,13 @@ let addRootIfNeeded = async function () {
 let addDir = async function (inode, name) {
   let parent = await r.db(databaseName).table(nodeTable).get(inode).run()
   let newDir = {
-    files: [],
-    subdirs: [],
+    nodes: [],
     name: name,
     id: await getNextINode(),
     created: Date.now(),
     modified: Date.now()
   }
-  parent.subdirs.push({ id: newDir.id, name: name })
+  parent.nodes.push(newDir.id)
 
   await r.db(databaseName).table(nodeTable).insert(newDir).run()
   await r.db(databaseName).table(nodeTable).get(inode).update(parent).run()
@@ -84,12 +82,12 @@ let addFile = async function (inode, file) {
   let fileInFolder = {
     id: await getNextINode(),
     name: file.filename,
-    fileId: newFile.id
+    fileId: newFile.id,
+    created: Date.now(),
+    modified: Date.now(),
+    size: file.buffer.length
   }
-  folder.files.push(fileInFolder)
-  fileInFolder.created = Date.now()
-  fileInFolder.modified = Date.now()
-  fileInFolder.size = file.buffer.length
+  folder.nodes.push(fileInFolder.id)
   await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
   await r.db(databaseName).table(nodeTable).get(inode).update(folder).run()
   return newFile
@@ -105,4 +103,45 @@ let getNode = async function (inode) {
   return await r.db(databaseName).table(nodeTable).get(inode).run()
 }
 
-module.exports = { init, bucket, addDir, addFile, getNode }
+let getFolder = async function (inode) {
+  return await r
+    .db(databaseName)
+    .table(nodeTable)
+    .get(inode)
+    .merge(node => {
+      return {
+        nodes: node('nodes')
+          .map(subNode => {
+            return r.db(databaseName).table(nodeTable).get(subNode)
+          })
+      }
+    })
+    .run()
+}
+
+let getNodeAttr = async function (item) {
+  let mode = null
+  let size = null
+  let nlink = null
+  if (item.fileId !== undefined) {
+    mode = 33279
+    size = item.size
+    nlink = 1
+  }
+  else {
+    mode = 16895
+    size = 4096
+    nlink = 1 + item.nodes.length
+  }
+  let attr = {
+    inode: item.id,
+    ctime: item.created,
+    mtime: item.modified,
+    mode: mode,
+    size: size,
+    nlink: nlink
+  }
+  return attr
+}
+
+module.exports = { init, bucket, addDir, addFile, getNode, getNodeAttr, getFolder }
