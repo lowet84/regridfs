@@ -17,7 +17,7 @@ let start = async function () {
 }
 
 let getTestFile = async function (number) {
-  var fileBuffer = Buffer.from(number, 'utf8');
+  var fileBuffer = Buffer.from(`A${number}`, 'utf8');
   return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
