@@ -56,9 +56,6 @@ class RegridFS extends fusejs.FileSystem {
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   async lookup (context, parentInode, name, reply) {
-    console.log('==================== lookup ====================')
-    console.log(`parentInode: ${parentInode}`)
-    console.log(`name: ${name}`)
     let parentItem = await common.getFolder(parentInode)
     if (parentItem === null) {
       reply.err(PosixError.ENOTENT);
@@ -67,7 +64,6 @@ class RegridFS extends fusejs.FileSystem {
     var item = await parentItem.nodes.find(d => d.name === name)
     let inodeItem = await common.getNode(item.id)
     let attr = await common.getNodeAttr(inodeItem)
-    console.log(`attr: ${JSON.stringify(attr)}`)
     const entry = {
       inode: item.id,
       attr: attr,
@@ -77,7 +73,6 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async getattr (context, inode, reply) {
-    console.log('==================== (getattr) ====================')
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
 
@@ -102,8 +97,6 @@ class RegridFS extends fusejs.FileSystem {
 
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
-    console.log('==================== (readdir) ====================')
-    console.log(`inode: ${JSON.stringify(inode)}`)
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
 		/*
@@ -130,12 +123,10 @@ class RegridFS extends fusejs.FileSystem {
     const size = Math.max(requestedSize, inodeItem.nodes.length * 256);
     for (var index = 0; index < inodeItem.nodes.length; index++) {
       var child = inodeItem.nodes[index]
-      console.log(`child: ${JSON.stringify(child)}`)
       let attr = await common.getNodeAttr(child)
       reply.addDirEntry(child.name, size, attr, offset)
     }
 
-    console.log(`buffer`)
     reply.buffer(new Buffer(0), requestedSize);
   }
 
