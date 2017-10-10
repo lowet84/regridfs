@@ -57,8 +57,11 @@ class RegridFS extends fusejs.FileSystem {
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   async lookup (context, parentInode, name, reply) {
     console.log('==================== lookup ====================')
+    console.log(`name: ${name}`)
     let parentItem = await common.getFolder(parentInode)
+    console.log(`parentItem: ${parentItem}`)
     let item = await parentItem.nodes.find(d=>d.name==name)
+    console.log(`item: ${item}`)
     if(item===null){
       reply.err(PosixError.ENOENT)
       return
