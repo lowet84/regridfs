@@ -7,6 +7,7 @@ let start = async function () {
   await common.init('localhost', true)
   let somedirId = await common.addDir(1, 'somedir')
   await common.addFile(somedirId, await getTestFile(1))
+  await common.addFile(somedirId, await getTestFile(1))
   await common.addFile(somedirId, await getTestFile(2))
   await common.addFile(somedirId, await getTestFile(3))
   await common.addFile(somedirId, await getTestFile(4))
@@ -14,6 +15,7 @@ let start = async function () {
   await common.addFile(somedirId, await getTestFile(6))
   await common.addFile(somedirId, await getTestFile(7))
   console.log(JSON.stringify(await common.getFolder(1)))
+  await debug()
   await debug()
   console.log('done')
 }
@@ -48,7 +50,13 @@ let debug = async function () {
       "nofollow": false
     }
   }
-  let reply = { "hasReplied": false }
+  let reply = {
+    "hasReplied": false,
+    entry: function(value){
+      let json = JSON.stringify(value)
+      console.log(`reply: ${json}`)
+    }
+  }
 
   await ops.create(context, inode, filename, mode, fileInfo, reply)
 }

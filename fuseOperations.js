@@ -14,11 +14,7 @@ let lookup = async function (context, parentInode, name, reply) {
     return 1
   }
   let attr = await common.getNodeAttr(inodeItem)
-  const entry = {
-    inode: item.id,
-    attr: attr,
-    generation: 1
-  }
+  let entry = getEntry(item.id, attr)
   reply.entry(entry);
   return 0
 }
@@ -87,8 +83,21 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let fileBuffer = Buffer.from('', 'utf8');
   let file = { filename: filename, buffer: fileBuffer }
   let result = await common.addFile(inode, file)
+  if(result === null){
+    return 3
+  }
+  let attr = await common.getNodeAttr(result)
+  var entry = await getEntry(result.id,attr)
+  reply.entry(entry)
 }
 
+let getEntry = async function (inode, attr) {
+  return {
+    inode: inode,
+    attr: attr,
+    generation: 1
+  }
+}
 
 module.exports = {
   lookup,

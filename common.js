@@ -86,6 +86,11 @@ let addDir = async function (inode, name) {
 
 let addFile = async function (inode, file) {
   let folder = await r.db(databaseName).table(nodeTable).get(inode).run()
+  var exists = await r.db(databaseName).table(nodeTable)
+    .filter({ name: file.filename, parent: inode })
+    if(exists.length>0){
+      return null
+    }
   let newFile = await bucket.writeFile(file)
   let fileInFolder = {
     id: await getNextINode(),
@@ -99,7 +104,7 @@ let addFile = async function (inode, file) {
   folder.nodes.push(fileInFolder.id)
   await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
   await r.db(databaseName).table(nodeTable).get(inode).update(folder).run()
-  return newFile
+  return fileInFolder
 }
 
 let initBucket = async function () {

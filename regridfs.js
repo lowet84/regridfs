@@ -38,13 +38,13 @@ class RegridFS extends fusejs.FileSystem {
     await handle(result, reply)
   }
 
-  async create(context, inode, filename, mode, fileInfo, reply){
+  async create (context, inode, filename, mode, fileInfo, reply) {
     common.debug('create', [context, inode, filename, mode, fileInfo, reply])
     let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
     await handle(result, reply)
   }
 
-  async write(a, b, c, d, e, f, g, h){
+  async write (a, b, c, d, e, f, g, h) {
     common.debug('write', [a, b, c, d, e, f, g, h])
   }
 
@@ -61,15 +61,20 @@ class RegridFS extends fusejs.FileSystem {
     reply.open(fileInfo);
   }
 
-  
+
 }
 
-var handle = async function (result, reply){
-  if(result === 1){
-    reply.err(PosixError.ENOENT);
-  }
-  else if (result === 2) {
-    reply.err(PosixError.EISDIR);
+var handle = async function (result, reply) {
+  switch (result) {
+    case 1:
+      reply.err(PosixError.ENOENT)
+      break
+    case 2:
+      reply.err(PosixError.EISDIR)
+      break
+    case 3:
+      reply.err(PosixError.EEXIST)
+      break
   }
 }
 
