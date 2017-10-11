@@ -87,9 +87,18 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
     return 3
   }
   let attr = await common.getNodeAttr(result)
-  // var entry = await getEntry(result.id,attr)
-  // console.log(Object.getOwnPropertyNames(reply));
-  await reply.attr(attr)
+  var entry = await getEntry(result.id,attr)
+  inspect(reply)
+  await reply.attr(entry)
+}
+
+let inspect = async function(obj){
+  var result = []
+  do {
+    result.push(...Object.getOwnPropertyNames(obj))
+  } while ((obj = Object.getPrototypeOf(obj)))
+  
+  console.log(result)
 }
 
 let getEntry = async function (inode, attr) {
