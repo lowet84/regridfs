@@ -56,7 +56,7 @@ let addRootIfNeeded = async function () {
       id: await getNextINode(),
       created: Date.now(),
       modified: Date.now(),
-      parent: null
+      parent: -1
     })
   }
 }
@@ -122,7 +122,8 @@ let getFolder = async function (inode) {
         nodes: node('nodes')
           .map(subNode => {
             return r.db(databaseName).table(nodeTable).get(subNode)
-          })
+          }),
+        parent: r.db(databaseName).table(nodeTable).get(node('parent'))
       }
     })
     .run()

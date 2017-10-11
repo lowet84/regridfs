@@ -13,7 +13,7 @@ let start = async function () {
   await common.addFile(somedirId, await getTestFile(6))
   await common.addFile(somedirId, await getTestFile(7))
   console.log(JSON.stringify(await common.getFolder(1)))
-  await debug(6, 4096, 0)
+  await debug()
   console.log('done')
 }
 
@@ -22,15 +22,11 @@ let getTestFile = async function (number) {
   return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
-let debug = async function (inode, len, offset) {
-  let inodeItem = await common.getNode(inode)
-  if (inodeItem === null) {
-    return
-  }
-
-  const length = inodeItem.size
-  let result = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
-  console.log(result)
+let debug = async function () {
+  let root = await common.getFolder(1)
+  console.log(root)
+  let dir = await common.getFolder(2)
+  console.log(dir)
 }
 
 start()
