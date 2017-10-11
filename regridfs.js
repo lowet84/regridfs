@@ -114,6 +114,10 @@ class RegridFS extends fusejs.FileSystem {
     reply.err(0);
   }
 
+  async create(a, b, c, d, e, f, g, h){
+    common.debug('create', [a, b, c, d, e, f, g, h])
+  }
+
   async write(a, b, c, d, e, f, g, h){
     common.debug('write', [a, b, c, d, e, f, g, h])
   }
