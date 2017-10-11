@@ -11,6 +11,7 @@ class RegridFS extends fusejs.FileSystem {
   async lookup (context, parentInode, name, reply) {
     common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
+    common.debug('lookup result', [result])
     await handle(result, reply)
   }
 
