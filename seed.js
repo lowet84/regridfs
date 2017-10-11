@@ -15,8 +15,9 @@ let start = async function () {
   await common.addFile(somedirId, await getTestFile(6))
   await common.addFile(somedirId, await getTestFile(7))
   console.log(JSON.stringify(await common.getFolder(1)))
-  await debug()
-  await debug()
+  await debugLookup()
+  await debugCreate()
+  await debugCreate()
   console.log('done')
 }
 
@@ -25,7 +26,19 @@ let getTestFile = async function (number) {
   return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
-let debug = async function () {
+let debugLookup = async function () {
+  await ops.lookup(null, 1, 'somedir', reply)
+}
+
+let reply = {
+  "hasReplied": false,
+  entry: function (value) {
+    let json = JSON.stringify(value)
+    console.log(`reply: ${json}`)
+  }
+}
+
+let debugCreate = async function () {
   let context = { 'uid': 0, 'gid': 0, 'pid': 10089, 'umask': 18 }
   let inode = 1
   let filename = 'testfil'
@@ -50,13 +63,7 @@ let debug = async function () {
       "nofollow": false
     }
   }
-  let reply = {
-    "hasReplied": false,
-    entry: function(value){
-      let json = JSON.stringify(value)
-      console.log(`reply: ${json}`)
-    }
-  }
+
 
   await ops.create(context, inode, filename, mode, fileInfo, reply)
 }

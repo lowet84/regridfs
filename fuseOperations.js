@@ -14,7 +14,7 @@ let lookup = async function (context, parentInode, name, reply) {
     return 1
   }
   let attr = await common.getNodeAttr(inodeItem)
-  let entry = getEntry(item.id, attr)
+  let entry = await getEntry(item.id, attr)
   reply.entry(entry);
   return 0
 }
