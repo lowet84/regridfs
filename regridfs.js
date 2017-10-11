@@ -56,6 +56,7 @@ class RegridFS extends fusejs.FileSystem {
 
   /* lookup, getattr, releasedir, opendir, readdir are the minimum functions that need to be implemented for listing directories */
   async lookup (context, parentInode, name, reply) {
+    common.debug('lookup', [context, parentInode, name, reply])
     let parentItem = await common.getFolder(parentInode)
     if (parentItem === null) {
       reply.err(PosixError.ENOTENT);
@@ -73,6 +74,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async getattr (context, inode, reply) {
+    common.debug('getattr', [context, inode, reply])
     //Get file attributes
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#a994c316fa7a1ca33525a4540675f6b47
 
@@ -97,6 +99,7 @@ class RegridFS extends fusejs.FileSystem {
 
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
+    common.debug('getattr', [context, inode, requestedSize, offset, fileInfo, reply])
     //http://fuse.sourceforge.net/doxygen/structfuse__lowlevel__ops.html#af1ef8e59e0cb0b02dc0e406898aeaa51
 
 		/*
@@ -131,7 +134,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async open (context, inode, fileInfo, reply) {
-    console.log('==================== (open) ====================')
+    common.debug('open', [context, inode, fileInfo, reply])
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);
@@ -146,7 +149,7 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   async read (context, inode, len, offset, fileInfo, reply) {
-    console.log('==================== read ====================')
+    common.debug('read', [context, inode, len, offset, fileInfo, reply])
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
       reply.err(PosixError.ENOTENT);

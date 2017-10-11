@@ -148,6 +148,14 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
+let debug = async function (name ,values) {
+  console.log(`====${name}====`)
+  values.forEach(element => {
+    console.log(JSON.stringify(element))
+  }, this);
+  console.log(`<><><><><><><><><>`)
+}
+
 module.exports = {
   init,
   bucket,
@@ -156,5 +164,6 @@ module.exports = {
   getNode,
   getNodeAttr,
   getFolder,
-  readFile
+  readFile,
+  debug
 }
