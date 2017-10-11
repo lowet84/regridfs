@@ -63,7 +63,7 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
     var item = await parentItem.nodes.find(d => d.name === name)
-    if (item === null) {
+    if (item === undefined) {
       reply.err(PosixError.ENOTENT);
       return
     }
