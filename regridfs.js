@@ -84,7 +84,7 @@ class RegridFS extends fusejs.FileSystem {
   async open (context, inode, fileInfo, reply) {
     common.debug('open', [context, inode, fileInfo, reply])
     let inodeItem = await common.getNode(inode)
-    if (inodeItem === null) {
+    if (inodeItem === null || inodeItem === undefined) {
       reply.err(PosixError.ENOTENT);
       return
     }
