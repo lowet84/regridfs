@@ -113,6 +113,10 @@ class RegridFS extends fusejs.FileSystem {
   release (context, inode, fileInfo, reply) {
     reply.err(0);
   }
+
+  async write(a, b, c, d, e, f, g, h){
+    common.debug('write', [a, b, c, d, e, f, g, h])
+  }
 }
 
 var common = require('./common')
