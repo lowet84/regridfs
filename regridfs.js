@@ -49,6 +49,10 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('write', [a, b, c, d, e, f, g, h])
   }
 
+  async mknod (a, b, c, d, e, f, g, h) {
+    common.debug('mknod', [a, b, c, d, e, f, g, h])
+  }
+
   // Non-handled
   release (context, inode, fileInfo, reply) {
     reply.err(0);
