@@ -10,17 +10,17 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('lookup', [context, parentInode, name, reply])
     let parentItem = await common.getFolder(parentInode)
     if (parentItem === null || parentItem === undefined) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
     var item = await parentItem.nodes.find(d => d.name === name)
     if (item === null || item === undefined) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
     let inodeItem = await common.getNode(item.id)
     if (inodeItem === null || inodeItem === undefined) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
     let attr = await common.getNodeAttr(inodeItem)
@@ -37,7 +37,7 @@ class RegridFS extends fusejs.FileSystem {
 
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
 
@@ -60,7 +60,7 @@ class RegridFS extends fusejs.FileSystem {
  
     let inodeItem = await common.getFolder(inode)
     if (inodeItem === null) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
 
@@ -85,7 +85,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('open', [context, inode, fileInfo, reply])
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null || inodeItem === undefined) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
     if (inodeItem.fileId === undefined) {
@@ -100,7 +100,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('read', [context, inode, len, offset, fileInfo, reply])
     let inodeItem = await common.getNode(inode)
     if (inodeItem === null) {
-      reply.err(PosixError.ENOTENT);
+      reply.err(PosixError.ENOENT);
       return
     }
 
