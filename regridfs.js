@@ -7,6 +7,7 @@ const PosixError = fusejs.PosixError;
 
 class RegridFS extends fusejs.FileSystem {
 
+  // Handled
   async lookup (context, parentInode, name, reply) {
     common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
@@ -17,25 +18,13 @@ class RegridFS extends fusejs.FileSystem {
 
   async getattr (context, inode, reply) {
     common.debug('getattr', [context, inode, reply])
-
-    let inodeItem = await common.getNode(inode)
-    if (inodeItem === null) {
+    let result = await ops.getattr(context, inode, reply)
+    if(result === 1){
       reply.err(PosixError.ENOENT);
-      return
     }
-
-    let attr = await common.getNodeAttr(inodeItem)
-    reply.attr(attr, 3600);
-    return;
   }
 
-  releasedir (context, inode, fileInfo, reply) {
-    reply.err(0);
-  }
-
-  opendir (context, inode, fileInfo, reply) {
-    reply.open(fileInfo);
-  }
+  
 
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
@@ -93,17 +82,28 @@ class RegridFS extends fusejs.FileSystem {
     return;
   }
 
-  release (context, inode, fileInfo, reply) {
-    reply.err(0);
-  }
-
   async create(context, inode, filename, mode, e, f, g, h){
-    common.debug('create', [a, b, c, d, e, f, g, h])
+    common.debug('create', [context, inode, filename, mode, e, f, g, h])
   }
 
   async write(a, b, c, d, e, f, g, h){
     common.debug('write', [a, b, c, d, e, f, g, h])
   }
+
+  // Non-handled
+  release (context, inode, fileInfo, reply) {
+    reply.err(0);
+  }
+
+  releasedir (context, inode, fileInfo, reply) {
+    reply.err(0);
+  }
+
+  opendir (context, inode, fileInfo, reply) {
+    reply.open(fileInfo);
+  }
+
+  
 }
 
 var common = require('./common')

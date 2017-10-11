@@ -23,6 +23,20 @@ let lookup = async function (context, parentInode, name, reply) {
   return 0
 }
 
+let getattr = async function (context, inode, reply) {
+  common.debug('getattr', [context, inode, reply])
+
+  let inodeItem = await common.getNode(inode)
+  if (inodeItem === null) {
+    return 1
+  }
+
+  let attr = await common.getNodeAttr(inodeItem)
+  reply.attr(attr, 3600);
+  return 0;
+}
+
 module.exports = { 
-  lookup 
+  lookup,
+  getattr
 }
