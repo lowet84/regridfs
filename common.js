@@ -55,7 +55,8 @@ let addRootIfNeeded = async function () {
       name: 'root',
       id: await getNextINode(),
       created: Date.now(),
-      modified: Date.now()
+      modified: Date.now(),
+      parent: null
     })
   }
 }
@@ -73,7 +74,8 @@ let addDir = async function (inode, name) {
     name: name,
     id: await getNextINode(),
     created: Date.now(),
-    modified: Date.now()
+    modified: Date.now(),
+    parent: inode
   }
   parent.nodes.push(newDir.id)
 
@@ -91,7 +93,8 @@ let addFile = async function (inode, file) {
     fileId: newFile.id,
     created: Date.now(),
     modified: Date.now(),
-    size: file.buffer.length
+    size: file.buffer.length,
+    parent: inode
   }
   folder.nodes.push(fileInFolder.id)
   await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
