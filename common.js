@@ -123,7 +123,7 @@ let getFolder = async function (inode) {
           .map(subNode => {
             return r.db(databaseName).table(nodeTable).get(subNode)
           }),
-        parent: r.db(databaseName).table(nodeTable).get(node('parent'))
+        parent: r.db(databaseName).table(nodeTable).get(node('parent')).default(null)
       }
     })
     .run()
@@ -154,7 +154,7 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
-let debug = async function (name ,values) {
+let debug = async function (name, values) {
   console.log(`====${name}====`)
   values.forEach(element => {
     console.log(JSON.stringify(element))
