@@ -9,17 +9,17 @@ class RegridFS extends fusejs.FileSystem {
   async lookup (context, parentInode, name, reply) {
     common.debug('lookup', [context, parentInode, name, reply])
     let parentItem = await common.getFolder(parentInode)
-    if (parentItem === null) {
+    if (parentItem === null || parentItem === undefined) {
       reply.err(PosixError.ENOTENT);
       return
     }
     var item = await parentItem.nodes.find(d => d.name === name)
-    if (item === undefined) {
+    if (item === null || item === undefined) {
       reply.err(PosixError.ENOTENT);
       return
     }
     let inodeItem = await common.getNode(item.id)
-    if (inodeItem === null) {
+    if (inodeItem === null || inodeItem === undefined) {
       reply.err(PosixError.ENOTENT);
       return
     }

@@ -23,10 +23,26 @@ let getTestFile = async function (number) {
 }
 
 let debug = async function () {
-  let root = await common.getFolder(1)
-  console.log(root)
-  let dir = await common.getFolder(2)
-  console.log(dir)
+  const parentInode = 1
+  const name = 'sdijslifjsdf'
+  let parentItem = await common.getFolder(parentInode)
+  if (parentItem === null) {
+    return
+  }
+  var item = await parentItem.nodes.find(d => d.name === name)
+  if (item === undefined) {
+    return
+  }
+  let inodeItem = await common.getNode(item.id)
+  if (inodeItem === null) {
+    return
+  }
+  let attr = await common.getNodeAttr(inodeItem)
+  const entry = {
+    inode: item.id,
+    attr: attr,
+    generation: 1
+  }
 }
 
 start()
