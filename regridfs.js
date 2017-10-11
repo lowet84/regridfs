@@ -1,6 +1,7 @@
 "use strict"
 
 const fusejs = require('fusejs'); //require('fusejs');
+const ops = require('./fuseOperations')
 const PosixError = fusejs.PosixError;
 
 
@@ -8,28 +9,10 @@ class RegridFS extends fusejs.FileSystem {
 
   async lookup (context, parentInode, name, reply) {
     common.debug('lookup', [context, parentInode, name, reply])
-    let parentItem = await common.getFolder(parentInode)
-    if (parentItem === null || parentItem === undefined) {
+    let result = await ops.lookup(context, parentInode, name, reply)
+    if(result === 1){
       reply.err(PosixError.ENOENT);
-      return
     }
-    var item = await parentItem.nodes.find(d => d.name === name)
-    if (item === null || item === undefined) {
-      reply.err(PosixError.ENOENT);
-      return
-    }
-    let inodeItem = await common.getNode(item.id)
-    if (inodeItem === null || inodeItem === undefined) {
-      reply.err(PosixError.ENOENT);
-      return
-    }
-    let attr = await common.getNodeAttr(inodeItem)
-    const entry = {
-      inode: item.id,
-      attr: attr,
-      generation: 1
-    }
-    reply.entry(entry);
   }
 
   async getattr (context, inode, reply) {
@@ -114,7 +97,7 @@ class RegridFS extends fusejs.FileSystem {
     reply.err(0);
   }
 
-  async create(a, b, c, d, e, f, g, h){
+  async create(context, inode, filename, mode, e, f, g, h){
     common.debug('create', [a, b, c, d, e, f, g, h])
   }
 
