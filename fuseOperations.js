@@ -88,6 +88,7 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   }
   let attr = await common.getNodeAttr(result)
   var entry = await getEntry(result.id,attr)
+  console.log(Object.getOwnPropertyNames(reply));
   reply.entry(entry)
 }
 
