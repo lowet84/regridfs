@@ -1,6 +1,7 @@
 const databaseName = 'regridfs'
 const nodeTable = 'inodes'
 const miscTable = 'misc'
+const mybucket_chunks = 'mybucket_chunks'
 
 var r = null
 var bucket = null
@@ -63,6 +64,13 @@ let addRootIfNeeded = async function () {
 
 let readFile = async function (fileId, length, offset) {
   let end = offset + length
+  let fileLengthInDb = await r.db(databaseName)
+  .table(mybucket_chunks)
+  .filter({file_id: fileId})('data').nth(0).count().run()
+
+  if(fileLengthInDb==0){
+    return { length: 0, buffer: new Buffer(0) }
+  }
   let result = await bucket.readFile({ id: fileId, seekStart: offset, seekEnd: end })
   return result
 }

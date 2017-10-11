@@ -17,7 +17,8 @@ let start = async function () {
   console.log(JSON.stringify(await common.getFolder(1)))
   await debugLookup()
   await debugCreate()
-  await debugCreate()
+  await debugRead(3)
+  await debugRead(10)
   console.log('done')
 }
 
@@ -35,7 +36,15 @@ let reply = {
   entry: function (value) {
     let json = JSON.stringify(value)
     console.log(`reply: ${json}`)
+  },
+  buffer: function (value) {
+    let json = JSON.stringify(value)
+    console.log(`buffer: ${json}`)
   }
+}
+
+let debugRead = async function (inode) {
+  await ops.read(null, inode, 4096, 0, null, reply)
 }
 
 let debugCreate = async function () {
