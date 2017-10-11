@@ -133,28 +133,37 @@ let getNodeAttr = async function (item) {
   let mode = null
   let size = null
   let nlink = null
-  let inode = 1
+  let inode = null
+  let created = null
+  let modified = null
   if (item === null) {
     mode = 16895
     size = 4096
     nlink = 1
-  }
-  else if (item.fileId !== undefined) {
-    mode = 33279
-    size = item.size
-    nlink = 1
-    inode = item.id
+    inode = 1
+    created = Date.now()
+    modified = Date.now()
   }
   else {
-    mode = 16895
-    size = 4096
-    nlink = 1 + item.nodes.length
     inode = item.id
+    created = item.created
+    modified = item.modified
+
+    if (item.fileId !== undefined) {
+      mode = 33279
+      size = item.size
+      nlink = 1
+    }
+    else {
+      mode = 16895
+      size = 4096
+      nlink = 1 + item.nodes.length
+    }
   }
   let attr = {
     inode: inode,
-    ctime: item.created,
-    mtime: item.modified,
+    ctime: created,
+    mtime: modified,
     mode: mode,
     size: size,
     nlink: nlink
