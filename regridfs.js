@@ -22,7 +22,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
     common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
-    let result = await ops.readdir(context, inode, reply)
+    let result = await ops.readdir(context, inode, requestedSize, offset, fileInfo, reply)
     await handle(result, reply)
   }
 

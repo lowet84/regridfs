@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 let common = require('./common')
 let ops = require('./fuseOperations')
@@ -24,7 +24,33 @@ let getTestFile = async function (number) {
 }
 
 let debug = async function () {
-  
+  let context = { 'uid': 0, 'gid': 0, 'pid': 10089, 'umask': 18 }
+  let inode = 1
+  let filename = 'testfil'
+  let mode = 33188
+  let fileInfo = {
+    "lock_owner": 0,
+    "file_handle": 0,
+    "nonseekable": false,
+    "flush": false,
+    "keep_cache": false,
+    "direct_io": false,
+    "writepage": false,
+    "flags": {
+      "rdonly": false,
+      "wronly": true,
+      "rdwr": false,
+      "nonblock": true,
+      "append": false,
+      "creat": true,
+      "trunc": false,
+      "excl": false,
+      "nofollow": false
+    }
+  }
+  let reply = { "hasReplied": false }
+
+  await ops.create(context, inode, filename, mode, fileInfo, reply)
 }
 
 start()
