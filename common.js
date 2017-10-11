@@ -60,8 +60,9 @@ let addRootIfNeeded = async function () {
   }
 }
 
-let readFile = async function (fileId) {
-  return await bucket.readFile({ id: fileId })
+let readFile = async function (fileId, length, offset) {
+  let end = offset + length
+  return await bucket.readFile({ id: fileId, seekStart: offset, seekEnd: end })
 }
 
 let addDir = async function (inode, name) {

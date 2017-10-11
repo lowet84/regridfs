@@ -9,7 +9,7 @@
  3: a file.
 */
 "use strict";
-const now = Date.now();
+// const now = Date.now();
 
 // const root = {
 //   inode: 1,
@@ -63,7 +63,15 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
     var item = await parentItem.nodes.find(d => d.name === name)
+    if (item === null) {
+      reply.err(PosixError.ENOTENT);
+      return
+    }
     let inodeItem = await common.getNode(item.id)
+    if (inodeItem === null) {
+      reply.err(PosixError.ENOTENT);
+      return
+    }
     let attr = await common.getNodeAttr(inodeItem)
     const entry = {
       inode: item.id,
@@ -156,9 +164,8 @@ class RegridFS extends fusejs.FileSystem {
       return
     }
 
-
     const length = inodeItem.size
-    const content = file_content.substr(offset, Math.min(length, offset + len));
+    const content = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
     reply.buffer(new Buffer(content), content.length);
     return;
   }
