@@ -133,6 +133,7 @@ let getNodeAttr = async function (item) {
   let mode = null
   let size = null
   let nlink = null
+  let inode = 1
   if (item === null) {
     mode = 16895
     size = 4096
@@ -142,14 +143,16 @@ let getNodeAttr = async function (item) {
     mode = 33279
     size = item.size
     nlink = 1
+    inode = item.id
   }
   else {
     mode = 16895
     size = 4096
     nlink = 1 + item.nodes.length
+    inode = item.id
   }
   let attr = {
-    inode: item.id,
+    inode: inode,
     ctime: item.created,
     mtime: item.modified,
     mode: mode,
