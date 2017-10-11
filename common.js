@@ -133,7 +133,12 @@ let getNodeAttr = async function (item) {
   let mode = null
   let size = null
   let nlink = null
-  if (item.fileId !== undefined) {
+  if (item === null) {
+    mode = 16895
+    size = 4096
+    nlink = 1
+  }
+  else if (item.fileId !== undefined) {
     mode = 33279
     size = item.size
     nlink = 1
