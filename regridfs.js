@@ -166,7 +166,7 @@ class RegridFS extends fusejs.FileSystem {
 
     const length = inodeItem.size
     const content = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
-    reply.buffer(new Buffer(content), content.length);
+    reply.buffer(content.buffer, content.length);
     return;
   }
 
