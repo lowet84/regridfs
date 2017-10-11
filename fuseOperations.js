@@ -23,9 +23,31 @@ let lookup = async function (context, parentInode, name, reply) {
   return 0
 }
 
-let getattr = async function (context, inode, reply) {
-  common.debug('getattr', [context, inode, reply])
+let readdir = async function (context, inode, requestedSize, offset, fileInfo, reply) {
+  let inodeItem = await common.getFolder(inode)
+  if (inodeItem === null) {
+    return 1
+  }
 
+  const size = Math.max(requestedSize, inodeItem.nodes.length * 256);
+
+  let thisAttr = await common.getNodeAttr(inodeItem)
+  reply.addDirEntry('.', size, thisAttr, offset)
+
+  let parentAttr = await common.getNodeAttr(inodeItem.parent)
+  reply.addDirEntry('..', size, parentAttr, offset)
+
+  for (var index = 0; index < inodeItem.nodes.length; index++) {
+    var child = inodeItem.nodes[index]
+    let attr = await common.getNodeAttr(child)
+    reply.addDirEntry(child.name, size, attr, offset)
+  }
+
+  reply.buffer(new Buffer(0), requestedSize);
+  return 0
+}
+
+let getattr = async function (context, inode, reply) {
   let inodeItem = await common.getNode(inode)
   if (inodeItem === null) {
     return 1
@@ -36,7 +58,41 @@ let getattr = async function (context, inode, reply) {
   return 0;
 }
 
-module.exports = { 
+let open = async function (context, inode, fileInfo, reply) {
+  let inodeItem = await common.getNode(inode)
+  if (inodeItem === null || inodeItem === undefined) {
+    return 1
+  }
+  if (inodeItem.fileId === undefined) {
+    return 2
+  }
+  reply.open(fileInfo);
+  return 0
+}
+
+let read = async function (context, inode, len, offset, fileInfo, reply) {
+  common.debug('read', [context, inode, len, offset, fileInfo, reply])
+  let inodeItem = await common.getNode(inode)
+  if (inodeItem === null) {
+    return 1
+  }
+
+  const length = inodeItem.size
+  const content = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
+  reply.buffer(content.buffer, content.length);
+  return 0
+}
+
+let create = async function (context, inode, filename, mode, fileInfo, reply) {
+
+}
+
+
+module.exports = {
   lookup,
-  getattr
+  getattr,
+  readdir,
+  open,
+  read,
+  create
 }

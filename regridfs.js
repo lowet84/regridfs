@@ -11,79 +11,37 @@ class RegridFS extends fusejs.FileSystem {
   async lookup (context, parentInode, name, reply) {
     common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
-    if(result === 1){
-      reply.err(PosixError.ENOENT);
-    }
+    await handle(result, reply)
   }
 
   async getattr (context, inode, reply) {
     common.debug('getattr', [context, inode, reply])
     let result = await ops.getattr(context, inode, reply)
-    if(result === 1){
-      reply.err(PosixError.ENOENT);
-    }
+    await handle(result, reply)
   }
-
-  
-
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
     common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
- 
-    let inodeItem = await common.getFolder(inode)
-    if (inodeItem === null) {
-      reply.err(PosixError.ENOENT);
-      return
-    }
-
-    const size = Math.max(requestedSize, inodeItem.nodes.length * 256);
-    
-    let thisAttr = await common.getNodeAttr(inodeItem)
-    reply.addDirEntry('.', size, thisAttr, offset)
-
-    let parentAttr = await common.getNodeAttr(inodeItem.parent)
-    reply.addDirEntry('..', size, parentAttr, offset)
-
-    for (var index = 0; index < inodeItem.nodes.length; index++) {
-      var child = inodeItem.nodes[index]
-      let attr = await common.getNodeAttr(child)
-      reply.addDirEntry(child.name, size, attr, offset)
-    }
-
-    reply.buffer(new Buffer(0), requestedSize);
+    let result = await ops.readdir(context, inode, reply)
+    await handle(result, reply)
   }
 
   async open (context, inode, fileInfo, reply) {
     common.debug('open', [context, inode, fileInfo, reply])
-    let inodeItem = await common.getNode(inode)
-    if (inodeItem === null || inodeItem === undefined) {
-      reply.err(PosixError.ENOENT);
-      return
-    }
-    if (inodeItem.fileId === undefined) {
-      reply.err(PosixError.EISDIR);
-      return;
-    }
-    reply.open(fileInfo);
-    return;
+    let result = await ops.open(context, inode, fileInfo, reply)
+    await handle(result, reply)
   }
 
   async read (context, inode, len, offset, fileInfo, reply) {
     common.debug('read', [context, inode, len, offset, fileInfo, reply])
-    let inodeItem = await common.getNode(inode)
-    if (inodeItem === null) {
-      reply.err(PosixError.ENOENT);
-      return
-    }
-
-    const length = inodeItem.size
-    const content = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
-    reply.buffer(content.buffer, content.length);
-    return;
+    let result = await ops.read(context, inode, len, offset, fileInfo, reply)
+    await handle(result, reply)
   }
 
-  async create(context, inode, filename, mode, e, f, g, h){
-    common.debug('create', [context, inode, filename, mode, e, f, g, h])
+  async create(context, inode, filename, mode, fileInfo, reply){
+    common.debug('create', [context, inode, filename, mode, fileInfo, reply])
+    let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
+    await handle(result, reply)
   }
 
   async write(a, b, c, d, e, f, g, h){
@@ -104,6 +62,15 @@ class RegridFS extends fusejs.FileSystem {
   }
 
   
+}
+
+var handle = async function (result, reply){
+  if(result === 1){
+    reply.err(PosixError.ENOENT);
+  }
+  else if (result === 2) {
+    reply.err(PosixError.EISDIR);
+  }
 }
 
 var common = require('./common')
