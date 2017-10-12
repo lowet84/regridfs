@@ -98,8 +98,11 @@ let setattr = async function (context, inode, options, reply) {
     return 1
   }
 
-  const m = new Date(options.mtime);
-  inodeItem.modified = m.getTime()
+  if (options.hasOwnProperty("mtime")) {
+    const m = new Date(options.mtime);
+    inodeItem.modified = m.getTime()
+  }
+  
   if (options.hasOwnProperty("size")) {
     inodeItem.size = options.size
   }
