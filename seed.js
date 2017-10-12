@@ -40,6 +40,10 @@ let reply = {
   buffer: function (value) {
     let json = JSON.stringify(value)
     console.log(`buffer: ${json}`)
+  },
+  create: function (value) {
+    let json = JSON.stringify(value)
+    console.log(`create: ${json}`)
   }
 }
 
