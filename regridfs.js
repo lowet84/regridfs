@@ -39,11 +39,11 @@ class RegridFS extends fusejs.FileSystem {
     await handle(result, reply)
   }
 
-  async create (context, inode, filename, mode, fileInfo, reply) {
-    common.debug('create', [context, inode, filename, mode, fileInfo, reply])
-    let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
-    await handle(result, reply)
-  }
+  // async create (context, inode, filename, mode, fileInfo, reply) {
+  //   common.debug('create', [context, inode, filename, mode, fileInfo, reply])
+  //   let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
+  //   await handle(result, reply)
+  // }
 
   async write (a, b, c, d, e, f, g, h) {
     common.debug('write', [a, b, c, d, e, f, g, h])
