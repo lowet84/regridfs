@@ -81,8 +81,8 @@ let addDir = async function (inode, name) {
     nodes: [],
     name: name,
     id: await getNextINode(),
-    created: Date.now(),
-    modified: Date.now(),
+    created: await now(),
+    modified: await now(),
     parent: inode
   }
   parent.nodes.push(newDir.id)
@@ -104,8 +104,8 @@ let addFile = async function (inode, file) {
     id: await getNextINode(),
     name: file.filename,
     fileId: newFile.id,
-    created: Date.now(),
-    modified: Date.now(),
+    created: await now(),
+    modified: await now(),
     size: file.buffer.length,
     parent: inode
   }
@@ -123,6 +123,10 @@ let initBucket = async function () {
 
 let getNode = async function (inode) {
   return await r.db(databaseName).table(nodeTable).get(inode).run()
+}
+
+let now = async function (){
+  return new Date().getTime()
 }
 
 let getFolder = async function (inode) {
