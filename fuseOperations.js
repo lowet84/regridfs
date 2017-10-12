@@ -83,22 +83,22 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let fileBuffer = Buffer.from('', 'utf8');
   let file = { filename: filename, buffer: fileBuffer }
   let result = await common.addFile(inode, file)
-  if(result === null){
+  if (result === null) {
     return 3
   }
   let attr = await common.getNodeAttr(result)
-  var entry = await getEntry(result.id,attr)
+  var entry = await getEntry(result.id, attr)
   inspect(reply)
-  reply.err(0)
+  reply.create(fileInfo)
   //await reply.entry(entry)
 }
 
-let inspect = async function(obj){
+let inspect = async function (obj) {
   var result = []
   do {
     result.push(...Object.getOwnPropertyNames(obj))
   } while ((obj = Object.getPrototypeOf(obj)))
-  
+
   console.log(result)
 }
 
