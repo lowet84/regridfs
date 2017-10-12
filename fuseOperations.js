@@ -89,8 +89,8 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let attr = await common.getNodeAttr(result)
   var entry = await getEntry(result.id,attr)
   inspect(reply)
-  reply.open(fileInfo);
-  // await reply.entry(entry)
+  reply.err(0)
+  //await reply.entry(entry)
 }
 
 let inspect = async function(obj){
