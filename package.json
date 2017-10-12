@@ -16,6 +16,7 @@
   "dependencies": {
     "rethinkdb-regrid": "^0.8.1",
     "fusejs": "^1.4.3",
-    "nan": "^2.7.0"
+    "nan": "^2.7.0",
+    "fuse-bindings": "^2.11.1"
   }
 }
