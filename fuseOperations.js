@@ -83,6 +83,7 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let fileBuffer = Buffer.from('', 'utf8');
   let file = { filename: filename, buffer: fileBuffer }
   let result = await common.addFile(inode, file)
+  fileInfo.file_handle = 0
   if (result === null) {
     return 3
   }
