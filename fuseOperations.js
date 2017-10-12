@@ -89,16 +89,27 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   }
   let attr = await common.getNodeAttr(result)
   let entry = await getEntry(result.id, attr)
-  reply.create( entry, fileInfo );
+  reply.create(entry, fileInfo);
 }
 
-let inspect = async function (obj) {
-  var result = []
-  do {
-    result.push(...Object.getOwnPropertyNames(obj))
-  } while ((obj = Object.getPrototypeOf(obj)))
+let setattr = async function (context, inode, options, reply) {
+  let inodeItem = await common.getNode(inode)
+  if (inodeItem === null) {
+    return 1
+  }
 
-  console.log(result)
+  const m = new Date(options.mtime);
+  inodeItem.modified = m.getTime()
+  if (options.hasOwnProperty("size")) {
+    inodeItem.size = options.size
+  }
+
+  if (options.hasOwnProperty("mode")) {
+    inodeItem.mode = options.mode
+  }
+  await common.updateNode(inodeItem)
+  let attr = await common.getNodeAttr(inodeItem)
+  reply.attr(attr, 5)
 }
 
 let getEntry = async function (inode, attr) {
@@ -115,5 +126,6 @@ module.exports = {
   readdir,
   open,
   read,
-  create
+  create,
+  setattr
 }

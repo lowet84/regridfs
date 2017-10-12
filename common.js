@@ -65,10 +65,10 @@ let addRootIfNeeded = async function () {
 let readFile = async function (fileId, length, offset) {
   let end = offset + length
   let fileLengthInDb = await r.db(databaseName)
-  .table(mybucket_chunks)
-  .filter({file_id: fileId})('data').nth(0).count().run()
+    .table(mybucket_chunks)
+    .filter({ file_id: fileId })('data').nth(0).count().run()
 
-  if(fileLengthInDb==0){
+  if (fileLengthInDb == 0) {
     return { length: 0, buffer: new Buffer(0) }
   }
   let result = await bucket.readFile({ id: fileId, seekStart: offset, seekEnd: end })
@@ -83,7 +83,8 @@ let addDir = async function (inode, name) {
     id: await getNextINode(),
     created: await now(),
     modified: await now(),
-    parent: inode
+    parent: inode,
+    mode: 16895
   }
   parent.nodes.push(newDir.id)
 
@@ -96,9 +97,9 @@ let addFile = async function (inode, file) {
   let folder = await r.db(databaseName).table(nodeTable).get(inode).run()
   var exists = await r.db(databaseName).table(nodeTable)
     .filter({ name: file.filename, parent: inode })
-    if(exists.length>0){
-      return null
-    }
+  if (exists.length > 0) {
+    return null
+  }
   let newFile = await bucket.writeFile(file)
   let fileInFolder = {
     id: await getNextINode(),
@@ -107,7 +108,8 @@ let addFile = async function (inode, file) {
     created: await now(),
     modified: await now(),
     size: file.buffer.length,
-    parent: inode
+    parent: inode,
+    mode: 33279
   }
   folder.nodes.push(fileInFolder.id)
   await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
@@ -125,7 +127,7 @@ let getNode = async function (inode) {
   return await r.db(databaseName).table(nodeTable).get(inode).run()
 }
 
-let now = async function (){
+let now = async function () {
   return new Date().getTime()
 }
 
@@ -144,6 +146,12 @@ let getFolder = async function (inode) {
       }
     })
     .run()
+}
+
+let updateNode = async function (inodeItem) {
+  await r.db(databaseName)
+    .table(nodeTable).get(inodeItem.id)
+    .update(inodeItem).run()
 }
 
 let getNodeAttr = async function (item) {
@@ -165,14 +173,13 @@ let getNodeAttr = async function (item) {
     inode = item.id
     created = item.created
     modified = item.modified
+    mode = item.mode
 
     if (item.fileId !== undefined) {
-      mode = 33279
       size = item.size
       nlink = 1
     }
     else {
-      mode = 16895
       size = 4096
       nlink = 1 + item.nodes.length
     }
@@ -205,5 +212,6 @@ module.exports = {
   getNodeAttr,
   getFolder,
   readFile,
-  debug
+  debug,
+  updateNode
 }

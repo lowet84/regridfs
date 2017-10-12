@@ -19,6 +19,7 @@ let start = async function () {
   await debugCreate()
   await debugRead(3)
   await debugRead(10)
+  await debugSetattr(10)
   console.log('done')
 }
 
@@ -44,6 +45,10 @@ let reply = {
   create: function (value) {
     let json = JSON.stringify(value)
     console.log(`create: ${json}`)
+  },
+  attr: function (value) {
+    let json = JSON.stringify(value)
+    console.log(`attr: ${json}`)
   }
 }
 
@@ -77,8 +82,12 @@ let debugCreate = async function () {
     }
   }
 
-
   await ops.create(context, inode, filename, mode, fileInfo, reply)
+}
+
+let debugSetattr = async function (inode) {
+  let options = { "atime": -1, "mtime": -1 }
+  await ops.setattr(null, inode, options, reply)
 }
 
 start()
