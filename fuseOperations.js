@@ -88,7 +88,8 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
     return 3
   }
   let attr = await common.getNodeAttr(result)
-  inspect(attr)
+  console.log('attr')
+  console.log(JSON.stringify(attr))
   reply.create( attr, fileInfo );
 }
 
