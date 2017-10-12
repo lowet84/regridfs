@@ -20,12 +20,13 @@ let start = async function () {
   await debugRead(3)
   await debugRead(10)
   await debugSetattr(10)
-  await debugWrite(10)
+  await debugWrite(10, 0)
+  await debugWrite(10, 2000)
   console.log('done')
 }
 
 let getTestFile = async function (number) {
-  var fileBuffer = Buffer.from(`A${number}`, 'utf8')
+  var fileBuffer = Buffer.from(`A${number}\n`, 'utf8')
   return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
@@ -53,7 +54,7 @@ let reply = {
   },
   write: function (value) {
     let json = JSON.stringify(value)
-    console.log(`write: ${json}`)
+    // console.log(`write: ${json}`)
   }
 }
 
@@ -61,9 +62,10 @@ let debugRead = async function (inode) {
   await ops.read(null, inode, 4096, 0, null, reply)
 }
 
-let debugWrite = async function(inode){
-  var buffer = Buffer.from(`some text`, 'utf8');
-  await ops.write(null, inode,buffer,0,null, reply)
+let debugWrite = async function(inode, offset){
+  var data = Array.apply(null, {length: 3000}).map(Number.call, Number).join('')
+  var buffer = Buffer.from(data, 'utf8').slice(0,4096);
+  await ops.write(null, inode,buffer,offset,null, reply)
 }
 
 let debugCreate = async function () {

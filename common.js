@@ -1,10 +1,11 @@
 const databaseName = 'regridfs'
 const nodeTable = 'inodes'
 const miscTable = 'misc'
-const mybucket_chunks = 'mybucket_chunks'
+const filesTable = 'files'
+// const mybucket_chunks = 'mybucket_chunks'
 
 var r = null
-var bucket = null
+// var bucket = null
 
 async function init (host, reset) {
   r = require('rethinkdbdash')({
@@ -14,7 +15,7 @@ async function init (host, reset) {
   })
 
   await initDb(reset)
-  await initBucket()
+  // await initBucket()
   await addRootIfNeeded()
 }
 
@@ -33,6 +34,8 @@ let initDb = async function (reset) {
     await r.db(databaseName).tableCreate(nodeTable).run()
     await r.db(databaseName).tableCreate(miscTable).run()
     await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 1 })
+    await r.db(databaseName).tableCreate(filesTable).run()
+    await r.db(databaseName).table(filesTable).indexCreate('inode').run()
   }
 }
 
@@ -52,6 +55,7 @@ let addRootIfNeeded = async function () {
   if (exists === null) {
     console.log('creating root folder')
     await r.db(databaseName).table(nodeTable).insert({
+      isDir: true,
       nodes: [],
       name: 'root',
       id: await getNextINode(),
@@ -63,7 +67,7 @@ let addRootIfNeeded = async function () {
   }
 }
 
-let readFile = async function (fileId, length, offset) {
+let readFile = async function (inode, length, offset) {
   let end = offset + length
   let fileLengthInDb = await r.db(databaseName)
     .table(mybucket_chunks)
@@ -79,6 +83,7 @@ let readFile = async function (fileId, length, offset) {
 let addDir = async function (inode, name) {
   let parent = await r.db(databaseName).table(nodeTable).get(inode).run()
   let newDir = {
+    isDir: true,
     nodes: [],
     name: name,
     id: await getNextINode(),
@@ -103,9 +108,9 @@ let addFile = async function (inode, file) {
   }
   let newFile = await bucket.writeFile(file)
   let fileInFolder = {
+    isDir: false,
     id: await getNextINode(),
     name: file.filename,
-    fileId: newFile.id,
     created: await now(),
     modified: await now(),
     size: file.buffer.length,
@@ -118,11 +123,11 @@ let addFile = async function (inode, file) {
   return fileInFolder
 }
 
-let initBucket = async function () {
-  const ReGrid = require('rethinkdb-regrid');
-  bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
-  await bucket.initBucket()
-}
+// let initBucket = async function () {
+//   const ReGrid = require('rethinkdb-regrid');
+//   bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
+//   await bucket.initBucket()
+// }
 
 let getNode = async function (inode) {
   return await r.db(databaseName).table(nodeTable).get(inode).run()
@@ -176,7 +181,7 @@ let getNodeAttr = async function (item) {
     modified = item.modified
     mode = item.mode
 
-    if (item.fileId !== undefined) {
+    if (!item.idDir) {
       size = item.size
       nlink = 1
     }
@@ -206,7 +211,6 @@ let debug = async function (name, values) {
 
 module.exports = {
   init,
-  bucket,
   addDir,
   addFile,
   getNode,

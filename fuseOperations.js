@@ -59,7 +59,7 @@ let open = async function (context, inode, fileInfo, reply) {
   if (inodeItem === null || inodeItem === undefined) {
     return 1
   }
-  if (inodeItem.fileId === undefined) {
+  if (inodeItem.isDir) {
     return 2
   }
   reply.open(fileInfo);
@@ -74,14 +74,14 @@ let read = async function (context, inode, len, offset, fileInfo, reply) {
   }
 
   const length = inodeItem.size
-  const content = await common.readFile(inodeItem.fileId, Math.min(length, offset + len), offset)
+  const content = await common.readFile(inodeItem.id, Math.min(length, offset + len), offset)
   reply.buffer(content.buffer, content.length);
   return 0
 }
 
 let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let fileBuffer = Buffer.from('', 'utf8');
-  let file = { filename: filename, buffer: fileBuffer }
+  let file = { filename: filename, buffer: fileBuffer, chunkSizeBytes: 4096 }
   let result = await common.addFile(inode, file)
   fileInfo.file_handle = 0
   if (result === null) {
