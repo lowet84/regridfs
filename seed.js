@@ -6,28 +6,18 @@ let ops = require('./fuseOperations')
 let start = async function () {
   await common.init('localhost', true)
   let somedirId = await common.addDir(1, 'somedir')
-  await common.addFile(somedirId, await getTestFile(1))
-  await common.addFile(somedirId, await getTestFile(1))
-  await common.addFile(somedirId, await getTestFile(2))
-  await common.addFile(somedirId, await getTestFile(3))
-  await common.addFile(somedirId, await getTestFile(4))
-  await common.addFile(somedirId, await getTestFile(5))
-  await common.addFile(somedirId, await getTestFile(6))
-  await common.addFile(somedirId, await getTestFile(7))
+  await common.createFile(somedirId, 'test1.txt')
+  await common.createFile(somedirId, 'test1.txt')
+  await common.createFile(somedirId, 'test2.txt')
   await common.getFolder(1)
   await debugLookup()
   await debugCreate()
-  await debugRead(3)
-  await debugRead(10)
-  await debugSetattr(10)
-  await debugWrite(10, 0)
-  await debugWrite(10, 2000)
+  await debugSetattr(4)
+  await debugWrite(4, 0, 2000, false)
+  await debugWrite(4, 2000, 4096, true)
+  await debugWrite(4, 2000, 4096, true)
+  await debugRead(4)
   console.log('done')
-}
-
-let getTestFile = async function (number) {
-  var fileBuffer = Buffer.from(`A${number}\n`, 'utf8')
-  return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
 let debugLookup = async function () {
@@ -62,10 +52,10 @@ let debugRead = async function (inode) {
   await ops.read(null, inode, 4096, 0, null, reply)
 }
 
-let debugWrite = async function(inode, offset){
-  var data = Array.apply(null, {length: 3000}).map(Number.call, Number).join('')
-  var buffer = Buffer.from(data, 'utf8').slice(0,4096);
-  await ops.write(null, inode,buffer,offset,null, reply)
+let debugWrite = async function (inode, offset, length, append) {
+  var data = Array.apply(null, { length: 3000 }).map(Number.call, Number).join('')
+  var buffer = Buffer.from(data, 'utf8').slice(0, length);
+  await ops.write(null, inode, buffer, offset, {append: append}, reply)
 }
 
 let debugCreate = async function () {

@@ -68,16 +68,37 @@ let addRootIfNeeded = async function () {
 }
 
 let readFile = async function (inode, length, offset) {
-  let end = offset + length
-  let fileLengthInDb = await r.db(databaseName)
-    .table(mybucket_chunks)
-    .filter({ file_id: fileId })('data').nth(0).count().run()
+  let files = await r.db(databaseName)
+    .table(filesTable)
+    .filter({ inode: inode })
+    .pluck('size', 'part', 'id')
+    .orderBy('part')
+    .coerceTo('Array')
+    .run()
 
-  if (fileLengthInDb == 0) {
-    return { length: 0, buffer: new Buffer(0) }
+  let dataLeft = length
+  let total = 0
+  let data = new Buffer(0)
+  for (var index = 0; index < files.length; index++) {
+    let file = files[index]
+    if (total >= offset) {
+      let temp = await r.db(databaseName)
+        .table(filesTable)
+        .get(file.id)
+        .run()
+      var start = Math.max(offset - total, 0)
+      var end = Math.min(dataLeft, file.size);
+      let selected = await temp.buffer.slice(start, end)
+      data = Buffer.concat([data, selected]);
+      dataLeft -= selected.length
+    }
+    total += file.size
+    if (total > offset + length) {
+      break
+    }
   }
-  let result = await bucket.readFile({ id: fileId, seekStart: offset, seekEnd: end })
-  return result
+
+  return { length: data.length, buffer: data }
 }
 
 let addDir = async function (inode, name) {
@@ -99,21 +120,20 @@ let addDir = async function (inode, name) {
   return newDir.id
 }
 
-let addFile = async function (inode, file) {
+let createFile = async function (inode, filename) {
   let folder = await r.db(databaseName).table(nodeTable).get(inode).run()
   var exists = await r.db(databaseName).table(nodeTable)
-    .filter({ name: file.filename, parent: inode })
+    .filter({ name: filename, parent: inode })
   if (exists.length > 0) {
     return null
   }
-  let newFile = await bucket.writeFile(file)
   let fileInFolder = {
     isDir: false,
     id: await getNextINode(),
-    name: file.filename,
+    name: filename,
     created: await now(),
     modified: await now(),
-    size: file.buffer.length,
+    size: 0,
     parent: inode,
     mode: 33279
   }
@@ -122,12 +142,6 @@ let addFile = async function (inode, file) {
   await r.db(databaseName).table(nodeTable).get(inode).update(folder).run()
   return fileInFolder
 }
-
-// let initBucket = async function () {
-//   const ReGrid = require('rethinkdb-regrid');
-//   bucket = ReGrid({ db: databaseName }, { bucketName: 'mybucket' })
-//   await bucket.initBucket()
-// }
 
 let getNode = async function (inode) {
   return await r.db(databaseName).table(nodeTable).get(inode).run()
@@ -201,6 +215,22 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
+let write = async function (inode, buffer, position, append) {
+  let part = 0
+  if (!append) {
+    await r.db(databaseName).table(filesTable).filter({ inode: inode }).delete().run()
+  }
+  else {
+    part = await r.db(databaseName).table(filesTable).filter({ inode: inode }).count().run()
+  }
+  await r.db(databaseName).table(filesTable).insert({
+    inode: inode,
+    buffer: buffer,
+    part: part,
+    size: buffer.length
+  }).run()
+}
+
 let debug = async function (name, values) {
   console.log(`====${name}====`)
   values.forEach(element => {
@@ -212,11 +242,12 @@ let debug = async function (name, values) {
 module.exports = {
   init,
   addDir,
-  addFile,
+  createFile,
   getNode,
   getNodeAttr,
   getFolder,
   readFile,
   debug,
-  updateNode
+  updateNode,
+  write
 }

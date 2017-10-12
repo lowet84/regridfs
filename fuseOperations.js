@@ -81,8 +81,8 @@ let read = async function (context, inode, len, offset, fileInfo, reply) {
 
 let create = async function (context, inode, filename, mode, fileInfo, reply) {
   let fileBuffer = Buffer.from('', 'utf8');
-  let file = { filename: filename, buffer: fileBuffer, chunkSizeBytes: 4096 }
-  let result = await common.addFile(inode, file)
+  let file = { filename: filename, buffer: fileBuffer }
+  let result = await common.createFile(inode, file)
   fileInfo.file_handle = 0
   if (result === null) {
     return 3
@@ -102,7 +102,7 @@ let setattr = async function (context, inode, options, reply) {
     const m = new Date(options.mtime);
     inodeItem.modified = m.getTime()
   }
-  
+
   if (options.hasOwnProperty("size")) {
     inodeItem.size = options.size
   }
@@ -121,8 +121,16 @@ let write = async function (context, inode, buffer, position, fileInfo, reply) {
     return 1
   }
 
-  let length = buffer.length
-  console.log(length)
+  await common.write(inode, buffer, position, fileInfo.append)
+  if (fileInfo.append) {
+    inodeItem.size += buffer.length
+  }
+  else {
+    inodeItem.size = buffer.length
+  }
+
+  await common.updateNode(inodeItem)
+  reply.write(buffer.length)
 }
 
 let getEntry = async function (inode, attr) {
