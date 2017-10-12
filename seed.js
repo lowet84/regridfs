@@ -14,17 +14,18 @@ let start = async function () {
   await common.addFile(somedirId, await getTestFile(5))
   await common.addFile(somedirId, await getTestFile(6))
   await common.addFile(somedirId, await getTestFile(7))
-  console.log(JSON.stringify(await common.getFolder(1)))
+  await common.getFolder(1)
   await debugLookup()
   await debugCreate()
   await debugRead(3)
   await debugRead(10)
   await debugSetattr(10)
+  await debugWrite(10)
   console.log('done')
 }
 
 let getTestFile = async function (number) {
-  var fileBuffer = Buffer.from(`A${number}`, 'utf8');
+  var fileBuffer = Buffer.from(`A${number}`, 'utf8')
   return { filename: `test${number}.txt`, buffer: fileBuffer }
 }
 
@@ -36,24 +37,33 @@ let reply = {
   "hasReplied": false,
   entry: function (value) {
     let json = JSON.stringify(value)
-    console.log(`reply: ${json}`)
+    // console.log(`reply: ${json}`)
   },
   buffer: function (value) {
     let json = JSON.stringify(value)
-    console.log(`buffer: ${json}`)
+    // console.log(`buffer: ${json}`)
   },
   create: function (value) {
     let json = JSON.stringify(value)
-    console.log(`create: ${json}`)
+    // console.log(`create: ${json}`)
   },
   attr: function (value) {
     let json = JSON.stringify(value)
-    console.log(`attr: ${json}`)
+    // console.log(`attr: ${json}`)
+  },
+  write: function (value) {
+    let json = JSON.stringify(value)
+    console.log(`write: ${json}`)
   }
 }
 
 let debugRead = async function (inode) {
   await ops.read(null, inode, 4096, 0, null, reply)
+}
+
+let debugWrite = async function(inode){
+  var buffer = Buffer.from(`some text`, 'utf8');
+  await ops.write(null, inode,buffer,0,null, reply)
 }
 
 let debugCreate = async function () {

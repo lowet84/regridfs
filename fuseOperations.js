@@ -112,6 +112,16 @@ let setattr = async function (context, inode, options, reply) {
   reply.attr(attr, 5)
 }
 
+let write = async function (context, inode, buffer, position, fileInfo, reply) {
+  let inodeItem = await common.getNode(inode)
+  if (inodeItem === null) {
+    return 1
+  }
+
+  let length = buffer.length
+  console.log(length)
+}
+
 let getEntry = async function (inode, attr) {
   return {
     inode: inode,
@@ -127,5 +137,6 @@ module.exports = {
   open,
   read,
   create,
-  setattr
+  setattr,
+  write
 }

@@ -57,7 +57,8 @@ let addRootIfNeeded = async function () {
       id: await getNextINode(),
       created: Date.now(),
       modified: Date.now(),
-      parent: -1
+      parent: -1,
+      mode: 16895
     })
   }
 }
