@@ -90,9 +90,7 @@ let create = async function (context, inode, filename, mode, fileInfo, reply) {
   var entry = await getEntry(result.id, attr)
   inspect(reply)
   inspect(entry)
-  //reply.create(entry)
-  await reply.entry(entry)
-  await reply.open(fileInfo)
+  reply.create( attr, fileInfo );
 }
 
 let inspect = async function (obj) {
