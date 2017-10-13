@@ -14,7 +14,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
     await handle(result, reply)
-    console.log(`lookup: ${new Date().getTime() - time}`)
+    // console.log(`lookup: ${new Date().getTime() - time}`)
   }
 
   async getattr (context, inode, reply) {
@@ -22,7 +22,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('getattr', [context, inode, reply])
     let result = await ops.getattr(context, inode, reply)
     await handle(result, reply)
-    console.log(`getattr: ${new Date().getTime() - time}`)
+    // console.log(`getattr: ${new Date().getTime() - time}`)
   }
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
@@ -30,7 +30,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
     let result = await ops.readdir(context, inode, requestedSize, offset, fileInfo, reply)
     await handle(result, reply)
-    console.log(`readdir: ${new Date().getTime() - time}`)
+    // console.log(`readdir: ${new Date().getTime() - time}`)
   }
 
   async open (context, inode, fileInfo, reply) {
@@ -38,7 +38,7 @@ class RegridFS extends fusejs.FileSystem {
     common.debug('open', [context, inode, fileInfo, reply])
     let result = await ops.open(context, inode, fileInfo, reply)
     await handle(result, reply)
-    console.log(`open: ${new Date().getTime() - time}`)
+    // console.log(`open: ${new Date().getTime() - time}`)
   }
 
   async read (context, inode, len, offset, fileInfo, reply) {
