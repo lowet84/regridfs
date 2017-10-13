@@ -13,15 +13,21 @@ let start = async function () {
   await debugLookup()
   await debugCreate()
   await debugSetattr(4)
-  await debugWrite(4, 0, 2000, false)
-  await debugWrite(4, 2000, 4096, true)
-  await debugWrite(4, 2000, 4096, true)
-  await debugRead(4)
+  /await debugWrite(4, 0, await getTestData(10))
+  await debugWrite(4, 5, await getTestData(200))
+  await debugWrite(3, 0, await getTestTextData())
+  await debugRead(3)
   console.log('done')
 }
 
 let debugLookup = async function () {
   await ops.lookup(null, 1, 'somedir', reply)
+}
+
+let getTestTextData = async function (){
+  let data = "RethinkDB write operations will only throw exceptions if errors occur before any writes. Other errors will be listed in first_error, and errors will be set to a non-zero count. To properly handle errors with this term, code must both handle exceptions and check the errors return value!"
+  var buffer = Buffer.from(data, 'utf8')
+  return buffer
 }
 
 let reply = {
@@ -48,14 +54,19 @@ let reply = {
   }
 }
 
+let getTestData = async function(length){
+  var data = Array.apply(null, { length: 3000 }).map(Number.call, Number).join('')
+  var buffer = Buffer.from(data, 'utf8').slice(0, length)
+  return buffer
+}
+
 let debugRead = async function (inode) {
   await ops.read(null, inode, 4096, 0, null, reply)
 }
 
-let debugWrite = async function (inode, offset, length, append) {
-  var data = Array.apply(null, { length: 3000 }).map(Number.call, Number).join('')
-  var buffer = Buffer.from(data, 'utf8').slice(0, length);
-  await ops.write(null, inode, buffer, offset, { flags: { append: append } }, reply)
+let debugWrite = async function (inode, offset, buffer) {
+  
+  await ops.write(null, inode, buffer, offset, null, reply)
 }
 
 let debugCreate = async function () {

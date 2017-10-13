@@ -2,10 +2,8 @@ const databaseName = 'regridfs'
 const nodeTable = 'inodes'
 const miscTable = 'misc'
 const filesTable = 'files'
-// const mybucket_chunks = 'mybucket_chunks'
 
 var r = null
-// var bucket = null
 
 async function init (host, reset) {
   r = require('rethinkdbdash')({
@@ -33,20 +31,17 @@ let initDb = async function (reset) {
     await r.dbCreate(databaseName).run()
     await r.db(databaseName).tableCreate(nodeTable).run()
     await r.db(databaseName).tableCreate(miscTable).run()
-    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 1 })
+    await r.db(databaseName).table(miscTable).insert({ id: 'nextInode', value: 0 })
     await r.db(databaseName).tableCreate(filesTable).run()
     await r.db(databaseName).table(filesTable).indexCreate('inode').run()
   }
 }
 
 let getNextINode = async function () {
-  let inode = await r.db(databaseName).table(miscTable).get('nextInode').run()
-  let value = inode.value
-  await r.db(databaseName)
-    .table(miscTable)
+  let inode = await r.db(databaseName).table(miscTable)
     .get('nextInode')
-    .update({ value: value + 1 })
-    .run()
+    .update({ value: r.row('value').add(1) }, { returnChanges: true }).run()
+  let value = inode.changes[0].new_val.value
   return value
 }
 
@@ -71,8 +66,8 @@ let readFile = async function (inode, length, offset) {
   let files = await r.db(databaseName)
     .table(filesTable)
     .filter({ inode: inode })
-    .pluck('size', 'part', 'id')
-    .orderBy('part')
+    .pluck('id')
+    .orderBy('id')
     .coerceTo('Array')
     .run()
 
@@ -87,8 +82,8 @@ let readFile = async function (inode, length, offset) {
         .get(file.id)
         .run()
       var start = Math.max(offset - total, 0)
-      var end = Math.min(dataLeft, file.size);
-      let selected = await temp.buffer.slice(start, end)
+      var end = Math.min(dataLeft, chunkSize);
+      let selected = await temp.data.slice(start, end)
       data = Buffer.concat([data, selected]);
       dataLeft -= selected.length
     }
@@ -144,7 +139,10 @@ let createFile = async function (inode, filename) {
 }
 
 let getNode = async function (inode) {
-  return await r.db(databaseName).table(nodeTable).get(inode).run()
+  return await r.db(databaseName)
+    .table(nodeTable)
+    .get(inode)
+    .run()
 }
 
 let now = async function () {
@@ -215,20 +213,107 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
-let write = async function (inode, buffer, position, append) {
-  let part = 0
-  if (!append) {
-    await r.db(databaseName).table(filesTable).filter({ inode: inode }).delete().run()
+let chunkSize = 100
+let write = async function (inode, buffer, position) {
+  let firstPart = Math.floor(position / chunkSize)
+
+
+
+  let part = firstPart
+  let dataLeft = buffer.length
+  // Handle first part
+  let offset = position % chunkSize
+  if (offset > 0) {
+    let toWrite = await buffer.slice(0, chunkSize - offset)
+    let data = await r.db(databaseName)
+      .table(filesTable)
+      .get(`${inode}___${part}`)
+      .run()
+    if (data !== null) {
+      let p1 = data.data.slice(0, offset)
+      let p2 = data.data.slice(offset + toWrite.length, chunkSize)
+      toWrite = await Buffer.concat([p1, toWrite, p2])
+      await r.db(databaseName)
+        .table(filesTable)
+        .get(data.id)
+        .update({ data: toWrite })
+        .run()
+    }
+    else {
+      console.log('cannot write to new part unless from the beginning of file')
+      return
+    }
+    part++
+    dataLeft -= (chunkSize - offset)
   }
-  else {
-    part = await r.db(databaseName).table(filesTable).filter({ inode: inode }).count().run()
+
+
+  // Handle middle parts
+  while (dataLeft >= chunkSize) {
+    let id = `${inode}___${part}`
+    let toWrite = await buffer.slice(
+      part * chunkSize - offset,
+      part * chunkSize + chunkSize - offset)
+    let existing = await r.db(databaseName)
+      .table(filesTable)
+      .get(id)
+      .pluck('id')
+      .default(null)
+      .run()
+    if (existing !== null) {
+      await r.db(databaseName)
+        .table(filesTable)
+        .get(id)
+        .update({ data: toWrite })
+        .run()
+    }
+    else {
+      await r.db(databaseName)
+        .table(filesTable)
+        .insert({ id: id, data: toWrite, inode: inode })
+        .run()
+    }
+    part++
+    dataLeft -= chunkSize
   }
-  await r.db(databaseName).table(filesTable).insert({
-    inode: inode,
-    buffer: buffer,
-    part: part,
-    size: buffer.length
-  }).run()
+
+  // Handle last part
+  if (dataLeft > 0) {
+    let id = `${inode}___${part}`
+    let toWrite = await buffer.slice(
+      part * chunkSize - offset,
+      part * chunkSize + dataLeft - offset)
+    let data = await r.db(databaseName)
+      .table(filesTable)
+      .get(id)
+      .run()
+    if (data !== null) {
+      let p2 = data.data.slice(offset + toWrite.length, chunkSize)
+      toWrite = await Buffer.concat([toWrite, p2])
+      await r.db(databaseName)
+        .table(filesTable)
+        .get(data.id)
+        .update({ data: toWrite })
+        .run()
+    }
+    else {
+      await r.db(databaseName)
+        .table(filesTable)
+        .insert({ id: id, data: toWrite, inode: inode })
+        .run()
+    }
+  }
+
+  // Update node size
+  let inodeItem = await r.db(databaseName)
+    .table(nodeTable)
+    .get(inode)
+    .run()
+  await r.db(databaseName)
+    .table(nodeTable)
+    .get(inode)
+    .update({ size: Math.max(inodeItem.size, position + buffer.length) })
+    .run()
 }
 
 let debug = async function (name, values) {

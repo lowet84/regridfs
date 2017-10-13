@@ -119,16 +119,8 @@ let write = async function (context, inode, buffer, position, fileInfo, reply) {
     return 1
   }
 
-  console.log(fileInfo)
-  console.log(fileInfo.flags)
-  console.log(fileInfo.flags.append)
-  await common.write(inode, buffer, position, fileInfo.flags.append)
-  if (fileInfo.append) {
-    inodeItem.size += buffer.length
-  }
-  else {
-    inodeItem.size = buffer.length
-  }
+  let size = await common.write(inode, buffer, position)
+  inodeItem.size = size
 
   await common.updateNode(inodeItem)
   reply.write(buffer.length)
