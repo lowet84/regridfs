@@ -13,7 +13,7 @@ let start = async function () {
   await debugLookup()
   await debugCreate()
   await debugSetattr(4)
-  /await debugWrite(4, 0, await getTestData(10))
+  await debugWrite(4, 0, await getTestData(10))
   await debugWrite(4, 5, await getTestData(200))
   await debugWrite(3, 0, await getTestTextData())
   await debugRead(3)

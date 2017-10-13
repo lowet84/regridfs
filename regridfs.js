@@ -13,7 +13,6 @@ class RegridFS extends fusejs.FileSystem {
     let time = new Date().getTime()
     common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
-    common.debug('lookup result', [result])
     await handle(result, reply)
     console.log(`lookup: ${new Date().getTime() - time}`)
   }
