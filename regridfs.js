@@ -9,50 +9,50 @@ class RegridFS extends fusejs.FileSystem {
 
   // Handled
   async lookup (context, parentInode, name, reply) {
-    common.debug('lookup', [context, parentInode, name, reply])
+    // common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
-    common.debug('lookup result', [result])
+    // common.debug('lookup result', [result])
     await handle(result, reply)
   }
 
   async getattr (context, inode, reply) {
-    common.debug('getattr', [context, inode, reply])
+    // common.debug('getattr', [context, inode, reply])
     let result = await ops.getattr(context, inode, reply)
     await handle(result, reply)
   }
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
-    common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
+    // common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
     let result = await ops.readdir(context, inode, requestedSize, offset, fileInfo, reply)
     await handle(result, reply)
   }
 
   async open (context, inode, fileInfo, reply) {
-    common.debug('open', [context, inode, fileInfo, reply])
+    // common.debug('open', [context, inode, fileInfo, reply])
     let result = await ops.open(context, inode, fileInfo, reply)
     await handle(result, reply)
   }
 
   async read (context, inode, len, offset, fileInfo, reply) {
-    common.debug('read', [context, inode, len, offset, fileInfo, reply])
+    // common.debug('read', [context, inode, len, offset, fileInfo, reply])
     let result = await ops.read(context, inode, len, offset, fileInfo, reply)
     await handle(result, reply)
   }
 
   async create (context, inode, filename, mode, fileInfo, reply) {
-    common.debug('create', [context, inode, filename, mode, fileInfo, reply])
+    // common.debug('create', [context, inode, filename, mode, fileInfo, reply])
     let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
     await handle(result, reply)
   }
 
   async setattr (context, inode, options, reply) {
-    common.debug('setattr', [context, inode, options, reply])
+    // common.debug('setattr', [context, inode, options, reply])
     let result = await ops.setattr(context, inode, options, reply)
     await handle(result, reply)
   }
 
   async write(context, inode, buffer, position, fileInfo, reply) {
-    common.debug('write', [context, inode, buffer, position, fileInfo, reply])
+    // common.debug('write', [context, inode, buffer, position, fileInfo, reply])
     let result = await ops.write(context, inode, buffer, position, fileInfo, reply)
     await handle(result, reply)
   }
