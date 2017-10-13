@@ -67,7 +67,6 @@ let open = async function (context, inode, fileInfo, reply) {
 }
 
 let read = async function (context, inode, len, offset, fileInfo, reply) {
-  common.debug('read', [context, inode, len, offset, fileInfo, reply])
   let inodeItem = await common.getNode(inode)
   if (inodeItem === null) {
     return 1
