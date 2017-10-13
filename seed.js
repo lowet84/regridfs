@@ -17,6 +17,7 @@ let start = async function () {
   await debugWrite(4, 5, await getTestData(200))
   await debugWrite(3, 0, await getTestTextData())
   await debugRead(3)
+  await debugReadDir(1)
   console.log('done')
 }
 
@@ -51,6 +52,10 @@ let reply = {
   write: function (value) {
     let json = JSON.stringify(value)
     // console.log(`write: ${json}`)
+  },
+  addDirEntry: function (value) {
+    let json = JSON.stringify(value)
+    // console.log(`write: ${json}`)
   }
 }
 
@@ -62,6 +67,10 @@ let getTestData = async function(length){
 
 let debugRead = async function (inode) {
   await ops.read(null, inode, 4096, 0, null, reply)
+}
+
+let debugReadDir = async function (inode) {
+  await ops.readdir(null, inode, 4096, 0, null, reply)
 }
 
 let debugWrite = async function (inode, offset, buffer) {
