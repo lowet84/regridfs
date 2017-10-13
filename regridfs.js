@@ -9,76 +9,76 @@ class RegridFS extends fusejs.FileSystem {
 
   // Handled
   async lookup (context, parentInode, name, reply) {
-    let time = Date.getTime()
+    console.log(time)
+    let time = new Date().getTime()
     // common.debug('lookup', [context, parentInode, name, reply])
     let result = await ops.lookup(context, parentInode, name, reply)
     // common.debug('lookup result', [result])
-    console.log(`lookup: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`lookup: ${new Date().getTime() - time}`)
   }
 
   async getattr (context, inode, reply) {
-    let time = Date.getTime()
-    console.log(time)
+    let time = new Date().getTime()
     // common.debug('getattr', [context, inode, reply])
     let result = await ops.getattr(context, inode, reply)
-    console.log(`getattr: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`getattr: ${new Date().getTime() - time}`)
   }
 
   async readdir (context, inode, requestedSize, offset, fileInfo, reply) {
-    let time = Date.getTime()
+    let time = new Date().getTime()
     // common.debug('readdir', [context, inode, requestedSize, offset, fileInfo, reply])
     let result = await ops.readdir(context, inode, requestedSize, offset, fileInfo, reply)
-    console.log(`readdir: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`readdir: ${new Date().getTime() - time}`)
   }
 
   async open (context, inode, fileInfo, reply) {
-    let time = Date.getTime()
+    let time = new Date().getTime()
     // common.debug('open', [context, inode, fileInfo, reply])
     let result = await ops.open(context, inode, fileInfo, reply)
-    console.log(`open: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`open: ${new Date().getTime() - time}`)
   }
 
   async read (context, inode, len, offset, fileInfo, reply) {
-    let time = Date.getTime()
+    let time = new Date().getTime()
     // common.debug('read', [context, inode, len, offset, fileInfo, reply])
     let result = await ops.read(context, inode, len, offset, fileInfo, reply)
-    console.log(`read: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`read: ${new Date().getTime() - time}`)
   }
 
   async create (context, inode, filename, mode, fileInfo, reply) {
-    let time = Date.getTime()
+    let time = new Date().getTime()
     // common.debug('create', [context, inode, filename, mode, fileInfo, reply])
     let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
-    console.log(`create: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`create: ${new Date().getTime() - time}`)
   }
 
   async setattr (context, inode, options, reply) {
-    let time = Date.getTime()
+    let time = new Date().getTime()
     // common.debug('setattr', [context, inode, options, reply])
     let result = await ops.setattr(context, inode, options, reply)
-    console.log(`setattr: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`setattr: ${new Date().getTime() - time}`)
   }
 
-  async write (context, inode, buffer, position, fileInfo, reply) {
-    let time = Date.getTime()
+  async write(context, inode, buffer, position, fileInfo, reply) {
+    let time = new Date().getTime()
     // common.debug('write', [context, inode, buffer, position, fileInfo, reply])
     let result = await ops.write(context, inode, buffer, position, fileInfo, reply)
-    console.log(`write: ${Date.getTime() - time}`)
     await handle(result, reply)
+    console.log(`write: ${new Date().getTime() - time}`)
   }
 
   async mknod (a, b, c, d, e, f, g, h) {
     common.debug('mknod', [a, b, c, d, e, f, g, h])
   }
 
-
+  
 
   // Non-handled
   release (context, inode, fileInfo, reply) {
