@@ -87,7 +87,7 @@ let readFile = async function (inode, length, offset) {
       data = Buffer.concat([data, selected]);
       dataLeft -= selected.length
     }
-    total += file.size
+    total += chunkSize
     if (total > offset + length) {
       break
     }
