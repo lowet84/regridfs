@@ -213,7 +213,7 @@ let getNodeAttr = async function (item) {
   return attr
 }
 
-let chunkSize = 100
+let chunkSize = 4096
 let write = async function (inode, buffer, position) {
   let firstPart = Math.floor(position / chunkSize)
 
