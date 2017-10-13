@@ -2,6 +2,7 @@ const databaseName = 'regridfs'
 const nodeTable = 'inodes'
 const miscTable = 'misc'
 const filesTable = 'files'
+var nodes = require('./nodes')
 
 var r = null
 
@@ -11,9 +12,8 @@ async function init (host, reset) {
       { host: host }
     ]
   })
-
   await initDb(reset)
-  // await initBucket()
+  await nodes.setR(r)
   await addRootIfNeeded()
 }
 
@@ -46,19 +46,10 @@ let getNextINode = async function () {
 }
 
 let addRootIfNeeded = async function () {
-  var exists = await r.db(databaseName).table(nodeTable).get(1).run()
+  var exists = await nodes.getNode(1)
   if (exists === null) {
     console.log('creating root folder')
-    await r.db(databaseName).table(nodeTable).insert({
-      isDir: true,
-      nodes: [],
-      name: 'root',
-      id: await getNextINode(),
-      created: Date.now(),
-      modified: Date.now(),
-      parent: -1,
-      mode: 16895
-    })
+    await nodes.addDir(await getNextINode(), -1, 'root')
   }
 }
 
@@ -97,79 +88,48 @@ let readFile = async function (inode, length, offset) {
 }
 
 let addDir = async function (inode, name) {
-  let parent = await r.db(databaseName).table(nodeTable).get(inode).run()
-  let newDir = {
-    isDir: true,
-    nodes: [],
-    name: name,
-    id: await getNextINode(),
-    created: await now(),
-    modified: await now(),
-    parent: inode,
-    mode: 16895
-  }
-  parent.nodes.push(newDir.id)
+  let parent = await nodes.getNode(inode)
+  let newId = await getNextINode()
+  parent.nodes.push(newId)
 
-  await r.db(databaseName).table(nodeTable).insert(newDir).run()
-  await r.db(databaseName).table(nodeTable).get(inode).update(parent).run()
-  return newDir.id
+  await nodes.addDir(newId, inode, name)
+  await nodes.saveNode(parent)
+  return newId
 }
 
 let createFile = async function (inode, filename) {
-  let folder = await r.db(databaseName).table(nodeTable).get(inode).run()
-  var exists = await r.db(databaseName).table(nodeTable)
-    .filter({ name: filename, parent: inode })
-  if (exists.length > 0) {
+  let folder = await nodes.getNode(inode)
+  if (await nodes.fileExists(inode, filename)) {
     return null
   }
-  let fileInFolder = {
-    isDir: false,
-    id: await getNextINode(),
-    name: filename,
-    created: await now(),
-    modified: await now(),
-    size: 0,
-    parent: inode,
-    mode: 33279
-  }
-  folder.nodes.push(fileInFolder.id)
-  await r.db(databaseName).table(nodeTable).insert(fileInFolder).run()
-  await r.db(databaseName).table(nodeTable).get(inode).update(folder).run()
-  return fileInFolder
+  let newId = await getNextINode()
+  folder.nodes.push(newId)
+  await nodes.addFile(newId, inode, filename)
+  await nodes.saveNode(folder)
+  return newId
 }
 
 let getNode = async function (inode) {
-  return await r.db(databaseName)
-    .table(nodeTable)
-    .get(inode)
-    .run()
-}
-
-let now = async function () {
-  return new Date().getTime()
+  return await nodes.getNode(inode)
 }
 
 let getFolder = async function (inode) {
-  return await r
-    .db(databaseName)
-    .table(nodeTable)
-    .get(inode)
-    .merge(node => {
-      return {
-        nodes: node('nodes')
-          .map(subNode => {
-            return r.db(databaseName).table(nodeTable).get(subNode)
-          }),
-        parent: r.db(databaseName).table(nodeTable).get(node('parent')).default(null)
-      }
-    })
-    .run()
+  console.log('test')
+  await nodes.removeCacheItem(inode)
+  let folder = await nodes.getNode(inode)
+  let subNodes = []
+  for (var index = 0; index < folder.nodes.length; index++) {
+    var node = folder.nodes[index];
+    subNodes.push(await nodes.getNode(node))
+  }
+  let parent = await nodes.getNode(folder.parent)
+  folder.nodes = subNodes
+  folder.parent = parent
+  return folder
 }
 
 let updateNode = async function (inodeItem) {
-  await r.db(databaseName)
-    .table(nodeTable).get(inodeItem.id)
-    .update(inodeItem).run()
+  await nodes.saveNode(inodeItem)
 }
 
 let getNodeAttr = async function (item) {
@@ -216,8 +176,6 @@ let getNodeAttr = async function (item) {
 let chunkSize = 4096
 let write = async function (inode, buffer, position) {
   let firstPart = Math.floor(position / chunkSize)
-
-
 
   let part = firstPart
   let dataLeft = buffer.length
@@ -305,15 +263,12 @@ let write = async function (inode, buffer, position) {
   }
 
   // Update node size
-  let inodeItem = await r.db(databaseName)
-    .table(nodeTable)
-    .get(inode)
-    .run()
-  await r.db(databaseName)
-    .table(nodeTable)
-    .get(inode)
-    .update({ size: Math.max(inodeItem.size, position + buffer.length) })
-    .run()
+  let inodeItem = await nodes.getNode(inode)
+  if (isNaN(inodeItem.size)) {
+    inodeItem.size = 0
+  }
+  inodeItem.size = Math.max(inodeItem.size, position + buffer.length)
+  await nodes.saveNode(inodeItem)
 }
 
 let debug = async function (name, values) {
