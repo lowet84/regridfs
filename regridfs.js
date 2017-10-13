@@ -36,7 +36,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async open (context, inode, fileInfo, reply) {
     let time = new Date().getTime()
-    // common.debug('open', [context, inode, fileInfo, reply])
+    common.debug('open', [context, inode, fileInfo, reply])
     let result = await ops.open(context, inode, fileInfo, reply)
     await handle(result, reply)
     console.log(`open: ${new Date().getTime() - time}`)
@@ -44,7 +44,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async read (context, inode, len, offset, fileInfo, reply) {
     let time = new Date().getTime()
-    // common.debug('read', [context, inode, len, offset, fileInfo, reply])
+    common.debug('read', [context, inode, len, offset, fileInfo, reply])
     let result = await ops.read(context, inode, len, offset, fileInfo, reply)
     await handle(result, reply)
     console.log(`read: ${new Date().getTime() - time}`)
@@ -52,7 +52,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async create (context, inode, filename, mode, fileInfo, reply) {
     let time = new Date().getTime()
-    // common.debug('create', [context, inode, filename, mode, fileInfo, reply])
+    common.debug('create', [context, inode, filename, mode, fileInfo, reply])
     let result = await ops.create(context, inode, filename, mode, fileInfo, reply)
     await handle(result, reply)
     console.log(`create: ${new Date().getTime() - time}`)
@@ -60,7 +60,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async setattr (context, inode, options, reply) {
     let time = new Date().getTime()
-    // common.debug('setattr', [context, inode, options, reply])
+    common.debug('setattr', [context, inode, options, reply])
     let result = await ops.setattr(context, inode, options, reply)
     await handle(result, reply)
     console.log(`setattr: ${new Date().getTime() - time}`)
@@ -68,7 +68,7 @@ class RegridFS extends fusejs.FileSystem {
 
   async write(context, inode, buffer, position, fileInfo, reply) {
     let time = new Date().getTime()
-    // common.debug('write', [context, inode, buffer, position, fileInfo, reply])
+    common.debug('write', [context, inode, buffer, position, fileInfo, reply])
     let result = await ops.write(context, inode, buffer, position, fileInfo, reply)
     await handle(result, reply)
     console.log(`write: ${new Date().getTime() - time}`)
