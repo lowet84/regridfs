@@ -55,7 +55,7 @@ let debugRead = async function (inode) {
 let debugWrite = async function (inode, offset, length, append) {
   var data = Array.apply(null, { length: 3000 }).map(Number.call, Number).join('')
   var buffer = Buffer.from(data, 'utf8').slice(0, length);
-  await ops.write(null, inode, buffer, offset, {append: append}, reply)
+  await ops.write(null, inode, buffer, offset, { flags: { append: append } }, reply)
 }
 
 let debugCreate = async function () {
