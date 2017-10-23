@@ -4,8 +4,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Seed",
-      "program": "${workspaceRoot}/seed.js"
+      "protocol": "auto",
+      "name": "Test",
+      "program": "${workspaceRoot}/test.js"
     }
   ]
 }
