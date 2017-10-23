@@ -125,7 +125,7 @@ let createFile = async function(inode, filename) {
   folder.nodes.push(newId);
   await nodes.addFile(newId, inode, filename);
   await nodes.saveNode(folder);
-  return newId;
+  return getNode(newId);
 };
 
 let getNode = async function(inode) {
@@ -174,7 +174,7 @@ let getNodeAttr = async function(item) {
     modified = item.modified;
     mode = item.mode;
 
-    if (!item.idDir) {
+    if (item.isDir === false) {
       size = item.size;
       nlink = 1;
     } else {
