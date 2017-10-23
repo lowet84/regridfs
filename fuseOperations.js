@@ -44,13 +44,19 @@ let readdir = async function (context, inode, requestedSize, offset, fileInfo, r
 }
 
 let getattr = async function (context, inode, reply) {
+  console.log("getattr1")
   let inodeItem = await common.getNode(inode)
+  console.log("getattr2")
   if (inodeItem === null) {
+    console.log("getattr3")
     return 1
   }
 
+  console.log("getattr4")
   let attr = await common.getNodeAttr(inodeItem)
+  console.log("getattr5")
   reply.attr(attr, 3600);
+  console.log("getattr6")
   return 0;
 }
 
