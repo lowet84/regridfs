@@ -11,26 +11,34 @@ let setR = async function(value) {
 };
 
 let getNode = async function(inode) {
+  console.log("getNode1");
   let cachedItem = cache[`i${inode}`];
+  console.log("getNode2");
   if (cachedItem !== null && cachedItem !== undefined) {
+    console.log("getNode3");
     let currentTime = await now();
+    console.log("getNode4");
     if (currentTime + cacheLifeMinutes * 60 * 1000 > cachedItem.time) {
+      console.log("getNode5");
       return cachedItem.value;
     }
   }
 
+  console.log("getNode6");
   let ret = await r
     .db(databaseName)
     .table(nodeTable)
     .get(inode)
     .run();
+  console.log("getNode7");
   cache[`i${inode}`] = { value: clone(ret), time: await now() };
+  console.log("getNode8");
   return ret;
 };
 
-let clone = function(obj){
-  return JSON.parse(JSON.stringify(obj))
-}
+let clone = function(obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
 
 let addDir = async function(inode, parent, name) {
   await r
