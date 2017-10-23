@@ -86,7 +86,10 @@ let fileExists = async function(inode, filename) {
 };
 
 let now = async function() {
-  return new Date().getTime();
+  console.log("now1");
+  let ret = new Date().getTime();
+  console.log("now2");
+  return ret;
 };
 
 let saveNode = async function(inodeItem) {
