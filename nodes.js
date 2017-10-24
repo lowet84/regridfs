@@ -113,5 +113,6 @@ module.exports = {
   saveNode,
   fileExists,
   addFile,
+  now,
   removeCacheItem
 };
