@@ -133,14 +133,19 @@ let getNode = async function(inode) {
 };
 
 let getFolder = async function(inode) {
+  console.log('getFolder1')
   await nodes.removeCacheItem(inode);
+  console.log('getFolder2')
   let folder = await nodes.getNode(inode);
+  console.log('getFolder3')
   let subNodes = [];
   for (var index = 0; index < folder.nodes.length; index++) {
     var node = folder.nodes[index];
     subNodes.push(await nodes.getNode(node));
   }
+  console.log('getFolder4')
   let parent = await nodes.getNode(folder.parent);
+  console.log('getFolder5')
   folder.nodes = subNodes;
   folder.parent = parent;
   return folder;

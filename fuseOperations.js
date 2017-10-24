@@ -27,7 +27,9 @@ let readdir = async function(
   fileInfo,
   reply
 ) {
+  console.log('readdir1')
   let inodeItem = await common.getFolder(inode);
+  console.log('readdir2')
   if (inodeItem === null) {
     return 1;
   }
