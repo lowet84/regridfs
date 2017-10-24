@@ -11,41 +11,31 @@ let setR = async function(value) {
 };
 
 let getNode = async function(inode) {
-  console.log("getNode1");
   let cachedItem = cache[`i${inode}`];
-  console.log("getNode2");
   if (cachedItem !== null && cachedItem !== undefined) {
-    console.log("getNode3");
     let currentTime = now();
-    console.log("getNode4");
     if (currentTime + cacheLifeMinutes * 60 * 1000 > cachedItem.time) {
-      console.log("getNode5");
-      await dummy()
-      console.log(cachedItem);
+      await dummy();
       return cachedItem.value;
     }
   }
 
-  console.log("getNode6");
   let ret = await r
     .db(databaseName)
     .table(nodeTable)
     .get(inode)
     .run();
-  console.log("getNode7");
   cache[`i${inode}`] = { value: clone(ret), time: now() };
-  console.log("getNode8");
   return ret;
 };
 
-let dummy = function () {
+let dummy = function() {
   return new Promise(resolve => {
     setTimeout(() => {
-      console.log('Dummy')
       resolve();
     }, 0);
   });
-}
+};
 
 let clone = function(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -97,9 +87,7 @@ let fileExists = async function(inode, filename) {
 };
 
 let now = function() {
-  console.log("now1");
   let ret = new Date().getTime();
-  console.log("now2");
   return ret;
 };
 
