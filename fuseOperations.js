@@ -131,8 +131,8 @@ let write = async function(context, inode, buffer, position, fileInfo, reply) {
     return 1;
   }
 
-  let size = await common.write(inode, buffer, position);
-  inodeItem.size = size;
+  await common.write(inode, buffer, position);
+  inodeItem.size = buffer.length;
 
   await common.updateNode(inodeItem);
   reply.write(buffer.length);
