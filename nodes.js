@@ -20,6 +20,7 @@ let getNode = async function(inode) {
     console.log("getNode4");
     if (currentTime + cacheLifeMinutes * 60 * 1000 > cachedItem.time) {
       console.log("getNode5");
+      console.log(cachedItem)
       return cachedItem.value;
     }
   }
