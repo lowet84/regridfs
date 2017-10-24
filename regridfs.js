@@ -9,19 +9,13 @@ class RegridFS extends fusejs.FileSystem {
   async lookup(context, parentInode, name, reply) {
     common.debug("lookup", [context, parentInode, name, reply]);
     let result = await ops.lookup(context, parentInode, name, reply);
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
   async getattr(context, inode, reply) {
-    try {
-      common.debug("getattr", [context, inode, reply]);
-      let result = await ops.getattr(context, inode, reply);
-      console.log(reply.hasReplied);
-      await handle(result, reply);
-    } catch (e) {
-      console.log(JSON.stringify(e))
-    }
+    common.debug("getattr", [context, inode, reply]);
+    let result = await ops.getattr(context, inode, reply);
+    await handle(result, reply);
   }
 
   async readdir(context, inode, requestedSize, offset, fileInfo, reply) {
@@ -41,21 +35,18 @@ class RegridFS extends fusejs.FileSystem {
       fileInfo,
       reply
     );
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
   async open(context, inode, fileInfo, reply) {
     common.debug("open", [context, inode, fileInfo, reply]);
     let result = await ops.open(context, inode, fileInfo, reply);
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
   async read(context, inode, len, offset, fileInfo, reply) {
     common.debug("read", [context, inode, len, offset, fileInfo, reply]);
     let result = await ops.read(context, inode, len, offset, fileInfo, reply);
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
@@ -69,14 +60,12 @@ class RegridFS extends fusejs.FileSystem {
       fileInfo,
       reply
     );
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
   async setattr(context, inode, options, reply) {
     common.debug("setattr", [context, inode, options, reply]);
     let result = await ops.setattr(context, inode, options, reply);
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 
@@ -90,7 +79,6 @@ class RegridFS extends fusejs.FileSystem {
       fileInfo,
       reply
     );
-    console.log(reply.hasReplied);
     await handle(result, reply);
   }
 

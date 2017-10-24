@@ -56,7 +56,6 @@ let getReply = function() {
     },
     attr: function(value) {
       this.finished = true
-      console.log(JSON.stringify(value))
     },
     write: function(value) {
       this.finished = true
