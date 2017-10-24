@@ -101,7 +101,7 @@ let saveNode = async function(inodeItem) {
   removeCacheItem(inodeItem.id);
 };
 
-let removeCacheItem = async function(inode) {
+let removeCacheItem = function(inode) {
   cache[`i${inode}`] = undefined;
 };
 

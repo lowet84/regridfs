@@ -134,7 +134,7 @@ let getNode = async function(inode) {
 
 let getFolder = async function(inode) {
   console.log('getFolder1')
-  await nodes.removeCacheItem(inode);
+  nodes.removeCacheItem(inode);
   console.log('getFolder2')
   let folder = await nodes.getNode(inode);
   console.log('getFolder3')
