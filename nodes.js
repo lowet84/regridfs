@@ -16,7 +16,7 @@ let getNode = async function(inode) {
   console.log("getNode2");
   if (cachedItem !== null && cachedItem !== undefined) {
     console.log("getNode3");
-    let currentTime = await now();
+    let currentTime = now();
     console.log("getNode4");
     if (currentTime + cacheLifeMinutes * 60 * 1000 > cachedItem.time) {
       console.log("getNode5");
@@ -31,7 +31,7 @@ let getNode = async function(inode) {
     .get(inode)
     .run();
   console.log("getNode7");
-  cache[`i${inode}`] = { value: clone(ret), time: await now() };
+  cache[`i${inode}`] = { value: clone(ret), time: now() };
   console.log("getNode8");
   return ret;
 };
@@ -49,8 +49,8 @@ let addDir = async function(inode, parent, name) {
       nodes: [],
       name: name,
       id: inode,
-      created: await now(),
-      modified: await now(),
+      created: now(),
+      modified: now(),
       parent: parent,
       mode: 16895
     });
@@ -65,8 +65,8 @@ let addFile = async function(inode, parent, filename) {
       isDir: false,
       id: inode,
       name: filename,
-      created: await now(),
-      modified: await now(),
+      created: now(),
+      modified: now(),
       size: 0,
       parent: parent,
       mode: 33279
@@ -85,7 +85,7 @@ let fileExists = async function(inode, filename) {
   return false;
 };
 
-let now = async function() {
+let now = function() {
   console.log("now1");
   let ret = new Date().getTime();
   console.log("now2");
