@@ -27,9 +27,9 @@ let readdir = async function(
   fileInfo,
   reply
 ) {
-  console.log('readdir1')
+  console.log("readdir1");
   let inodeItem = await common.getFolder(inode);
-  console.log('readdir2')
+  console.log("readdir2");
   if (inodeItem === null) {
     return 1;
   }
@@ -132,7 +132,7 @@ let write = async function(context, inode, buffer, position, fileInfo, reply) {
   }
 
   await common.write(inode, buffer, position);
-  inodeItem.size = buffer.length;
+  inodeItem.size = Math.max(buffer.length + position, inodeItem.size);
 
   await common.updateNode(inodeItem);
   reply.write(buffer.length);
