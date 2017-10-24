@@ -20,7 +20,8 @@ let getNode = async function(inode) {
     console.log("getNode4");
     if (currentTime + cacheLifeMinutes * 60 * 1000 > cachedItem.time) {
       console.log("getNode5");
-      console.log(cachedItem)
+      await dummy()
+      console.log(cachedItem);
       return cachedItem.value;
     }
   }
@@ -36,6 +37,15 @@ let getNode = async function(inode) {
   console.log("getNode8");
   return ret;
 };
+
+let dummy = function () {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      console.log('Dummy')
+      resolve();
+    }, 0);
+  });
+}
 
 let clone = function(obj) {
   return JSON.parse(JSON.stringify(obj));

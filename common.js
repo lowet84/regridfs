@@ -166,8 +166,8 @@ let getNodeAttr = async function(item) {
     size = 4096
     nlink = 1
     inode = 1
-    created = await nodes.now()
-    modified = await nodes.now()
+    created = nodes.now()
+    modified = nodes.now()
   } else {
     inode = item.id
     created = item.created
