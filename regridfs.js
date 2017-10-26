@@ -86,10 +86,6 @@ class RegridFS extends fusejs.FileSystem {
     common.debug("mknod", [a, b, c, d, e, f, g, h]);
   }
 
-  async fsync(a, b, c, d, e, f, g, h) {
-    common.debug("fsync", [a, b, c, d, e, f, g, h]);
-  }
-
   // Non-handled
   release(context, inode, fileInfo, reply) {
     reply.err(0);
@@ -101,6 +97,10 @@ class RegridFS extends fusejs.FileSystem {
 
   opendir(context, inode, fileInfo, reply) {
     reply.open(fileInfo);
+  }
+
+  fsync(context, inode, something, fileInfo, reply) {
+    common.debug("fsync", [context, inode, something, fileInfo, reply]);
   }
 }
 
