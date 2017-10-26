@@ -4,7 +4,7 @@ const miscTable = "misc";
 const filesTable = "files";
 var nodes = require("./nodes");
 
-var debugMode = 1;
+var debugMode = 2;
 var r = null;
 
 async function init(host, reset) {
