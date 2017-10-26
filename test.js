@@ -65,6 +65,9 @@ let getReply = function() {
     addDirEntry: function(value) {
       this.finished = true
     },
+    err: function(value) {
+      this.finished = true
+    },
     validate: function(){
       if(!this.finished){
         throw "NOT DONE!!!"
