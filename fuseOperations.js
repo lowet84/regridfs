@@ -146,6 +146,15 @@ let getEntry = async function(inode, attr) {
   };
 };
 
+let access = async function(context, inode, mask, reply) {
+  let inodeItem = await common.getNode(inode);
+  if (inodeItem === null) {
+    return 1;
+  }
+
+  reply.err(0);
+};
+
 module.exports = {
   lookup,
   getattr,
@@ -154,5 +163,6 @@ module.exports = {
   read,
   create,
   setattr,
-  write
+  write,
+  access
 };

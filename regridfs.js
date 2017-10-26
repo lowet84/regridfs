@@ -82,6 +82,12 @@ class RegridFS extends fusejs.FileSystem {
     await handle(result, reply);
   }
 
+  async access(context, inode, mask, reply) {
+    common.debug("access", [context, inode, mask, reply]);
+    let result = await ops.access(context, inode, mask, reply);
+    await handle(result, reply);
+  }
+
   async mknod(a, b, c, d, e, f, g, h) {
     common.debug("mknod", [a, b, c, d, e, f, g, h]);
   }
@@ -105,6 +111,10 @@ class RegridFS extends fusejs.FileSystem {
 
   fsync(context, inode, something, fileInfo, reply) {
     common.debug("fsync", [context, inode, something, fileInfo, reply]);
+    reply.err(0);
+  }
+
+  flush(context, inode, fileInfo, reply) {
     reply.err(0);
   }
 }
