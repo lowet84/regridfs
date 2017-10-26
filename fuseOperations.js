@@ -151,7 +151,24 @@ let access = async function(context, inode, mask, reply) {
   }
 
   reply.err(0);
+  return 0;
 };
+
+let unlink = async function(context, parentInode, name, reply) {
+  let parentItem = await common.getFolder(parentInode);
+  if (parentItem === null || parentItem === undefined) {
+    return 1;
+  }
+  var item = await parentItem.nodes.find(d => d.name === name);
+  if (item === null || item === undefined) {
+    return 1;
+  }
+  
+  common.deleteFile(item.id)
+
+  reply.err(0);
+  return 0;
+}
 
 module.exports = {
   lookup,
@@ -162,5 +179,6 @@ module.exports = {
   create,
   setattr,
   write,
-  access
+  access,
+  unlink
 };

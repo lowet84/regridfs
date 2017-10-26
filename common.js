@@ -151,6 +151,21 @@ let updateNode = async function(inodeItem) {
   await nodes.saveNode(inodeItem);
 };
 
+let deleteFile = async function(inode) {
+  await r
+    .db(databaseName)
+    .table(filesTable)
+    .filter({ inode: inode })
+    .delete()
+    .run();
+  await r
+    .db(databaseName)
+    .table(nodeTable)
+    .get(inode)
+    .delete()
+    .run();
+};
+
 let getNodeAttr = async function(item) {
   let mode = null;
   let size = null;
@@ -314,5 +329,6 @@ module.exports = {
   readFile,
   debug,
   updateNode,
-  write
+  write,
+  deleteFile
 };

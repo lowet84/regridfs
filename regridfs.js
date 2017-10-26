@@ -92,8 +92,10 @@ class RegridFS extends fusejs.FileSystem {
     common.debug("mknod", [a, b, c, d, e, f, g, h]);
   }
 
-  async unlink(a, b, c, d, e, f, g, h) {
-    common.debug("unlink", [a, b, c, d, e, f, g, h]);
+  async unlink(context, parentInode, name, reply) {
+    common.debug("unlink", [context, parentInode, name, reply]);
+    let result = await ops.unlink(context, parentInode, name, reply);
+    await handle(result, reply);
   }
 
   // Non-handled

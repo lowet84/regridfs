@@ -20,6 +20,7 @@ let start = async function() {
   await debugRead(3);
   await debugReadDir(1);
   await debugGetAttr();
+  await debugDelete(2, 'test2.txt')
   console.log("done");
 };
 
@@ -141,5 +142,11 @@ let debugSetattr = async function(inode) {
   await ops.setattr(null, inode, options, reply)
   reply.validate();
 };
+
+let debugDelete = async function(parentInode, name){
+  let reply = getReply()
+  await ops.unlink(null, parentInode, name, reply)
+  reply.validate();
+}
 
 start();
