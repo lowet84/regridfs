@@ -92,7 +92,7 @@ let read = async function(context, inode, len, offset, fileInfo, reply) {
 };
 
 let create = async function(context, inode, filename, mode, fileInfo, reply) {
-  let result = await common.createFile(inode, filename);
+  let result = await common.createFile(inode, filename, mode);
   fileInfo.file_handle = 0;
   if (result === null) {
     return 3;

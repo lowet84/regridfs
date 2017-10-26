@@ -116,14 +116,14 @@ let addDir = async function(inode, name) {
   return newId;
 };
 
-let createFile = async function(inode, filename) {
+let createFile = async function(inode, filename, mode) {
   let folder = await nodes.getNode(inode);
   if (await nodes.fileExists(inode, filename)) {
     return null;
   }
   let newId = await getNextINode();
   folder.nodes.push(newId);
-  await nodes.addFile(newId, inode, filename);
+  await nodes.addFile(newId, inode, filename, mode);
   await nodes.saveNode(folder);
   return getNode(newId);
 };

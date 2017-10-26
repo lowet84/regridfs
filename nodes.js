@@ -58,7 +58,7 @@ let addDir = async function(inode, parent, name) {
   removeCacheItem(inode);
 };
 
-let addFile = async function(inode, parent, filename) {
+let addFile = async function(inode, parent, filename, mode) {
   await r
     .db(databaseName)
     .table(nodeTable)
@@ -70,7 +70,7 @@ let addFile = async function(inode, parent, filename) {
       modified: now(),
       size: 0,
       parent: parent,
-      mode: 33279
+      mode: mode
     });
   removeCacheItem(inode);
 };

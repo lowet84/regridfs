@@ -6,12 +6,13 @@ let ops = require("./fuseOperations");
 let start = async function() {
   await common.init("localhost", true);
   let somedirId = await common.addDir(1, "somedir");
-  await common.createFile(somedirId, "test1.txt");
-  await common.createFile(somedirId, "test1.txt");
-  await common.createFile(somedirId, "test2.txt");
+  await common.createFile(somedirId, "test1.txt", 33152);
+  await common.createFile(somedirId, "test1.txt", 33152);
+  await common.createFile(somedirId, "test2.txt", 33152);
   await common.getFolder(1);
   await debugLookup();
   await debugCreate();
+  await debugReadEmptyFile();
   await debugSetattr(4);
   await debugWrite(4, 0, await getTestData(10));
   await debugWrite(4, 5, await getTestData(200));
@@ -127,6 +128,12 @@ let debugCreate = async function() {
   await ops.create(context, inode, filename, mode, fileInfo, reply)
   reply.validate();
 };
+
+let debugReadEmptyFile = async function(){
+  let reply = getReply()
+  await ops.read(null, 5, 4096, 0, null, reply);
+  reply.validate();
+}
 
 let debugSetattr = async function(inode) {
   let options = { atime: -1, mtime: -1 }
