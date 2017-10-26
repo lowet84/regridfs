@@ -151,7 +151,7 @@ let updateNode = async function(inodeItem) {
   await nodes.saveNode(inodeItem);
 };
 
-let deleteFile = async function(inode) {
+let deleteFile = async function(inode, parentInode) {
   await r
     .db(databaseName)
     .table(filesTable)
@@ -164,6 +164,10 @@ let deleteFile = async function(inode) {
     .get(inode)
     .delete()
     .run();
+  let parent = await nodes.getNode(parentInode);
+  var index = parent.nodes.indexOf(inode);
+  parent.nodes.splice(index, 1);
+  await nodes.saveNode(parent);
 };
 
 let getNodeAttr = async function(item) {

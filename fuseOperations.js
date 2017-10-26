@@ -164,7 +164,7 @@ let unlink = async function(context, parentInode, name, reply) {
     return 1;
   }
   
-  common.deleteFile(item.id)
+  common.deleteFile(item.id, parentInode)
 
   reply.err(0);
   return 0;
