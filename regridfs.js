@@ -101,6 +101,7 @@ class RegridFS extends fusejs.FileSystem {
 
   fsync(context, inode, something, fileInfo, reply) {
     common.debug("fsync", [context, inode, something, fileInfo, reply]);
+    reply.err(0);
   }
 }
 
