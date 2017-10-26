@@ -4,6 +4,7 @@ const miscTable = "misc";
 const filesTable = "files";
 var nodes = require("./nodes");
 
+var debugMode = 1;
 var r = null;
 
 async function init(host, reset) {
@@ -133,19 +134,19 @@ let getNode = async function(inode) {
 };
 
 let getFolder = async function(inode) {
-  console.log('getFolder1')
+  console.log("getFolder1");
   nodes.removeCacheItem(inode);
-  console.log('getFolder2')
+  console.log("getFolder2");
   let folder = await nodes.getNode(inode);
-  console.log('getFolder3')
+  console.log("getFolder3");
   let subNodes = [];
   for (var index = 0; index < folder.nodes.length; index++) {
     var node = folder.nodes[index];
     subNodes.push(await nodes.getNode(node));
   }
-  console.log('getFolder4')
+  console.log("getFolder4");
   let parent = await nodes.getNode(folder.parent);
-  console.log('getFolder5')
+  console.log("getFolder5");
   folder.nodes = subNodes;
   folder.parent = parent;
   return folder;
@@ -299,7 +300,9 @@ let write = async function(inode, buffer, position) {
 };
 
 let debug = async function(name, values) {
+  if (debugMode === 0) return;
   console.log(`====${name}====`);
+  if (debugMode === 1) return;
   values.forEach(element => {
     console.log(JSON.stringify(element));
   }, this);
